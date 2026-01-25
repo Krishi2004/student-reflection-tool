@@ -58,7 +58,7 @@ public function create()
 
         // 4. SAVE REFLECTION (Main Entry)
         $reflection = Reflection::create([
-            'student_id' => Auth::id(),
+            'user_id' => Auth::id(),
             'title' => $request->title,
             'narrative' => json_encode($narrativeData), // Save as JSON
             'r_quality_score' => $qualityScore,

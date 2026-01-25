@@ -26,6 +26,17 @@
 </head>
 <body class="bg-gray-100"> 
 
+@if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Whoops! Something went wrong.</strong>
+        <ul class="mt-2 list-disc list-inside">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 
     @include('layouts.public-nav')
 
@@ -84,7 +95,10 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Result</label>
                         <textarea name="result" rows="2" required class="w-full rounded border-gray-300" placeholder="Outcome..."></textarea>
-                        <input type="hidden" name="analysis" value="Included in Result"> 
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Analysis (What did you learn?)</label>
+                        <textarea name="analysis" rows="2" required class="w-full rounded border-gray-300" placeholder="If you did this again, what would you do differently?"></textarea>
                     </div>
                 </div>
 
