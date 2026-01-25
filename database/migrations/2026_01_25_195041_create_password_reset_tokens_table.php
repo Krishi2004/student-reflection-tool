@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        /**
+         * Created to fix the reset password logic
+         */
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
