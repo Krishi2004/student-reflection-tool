@@ -10,7 +10,7 @@ class Reflection extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id',
+        'user_id',
         'title',
         'narrative',
         'r_quality_score',

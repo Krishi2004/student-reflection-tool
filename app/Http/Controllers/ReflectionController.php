@@ -19,10 +19,13 @@ public function create()
     // 1. Fetch the skills from the database
     $skills = Skill::all(); 
 
-    // 2. Pass the 'skills' variable to the view
-    // If your view is named 'reflection.blade.php', use 'reflection'
-    // If it is in a folder 'reflections/create.blade.php', use 'reflections.create'
-    return view('reflection', compact('skills')); 
+    $reflections = Reflection::where('user_id', Auth::id())
+        ->with('skillAssessments.skill') 
+        ->latest() // Short for orderBy('created_at', 'desc')
+        ->get();
+
+
+    return view('reflection', compact('skills','reflections')); 
 }
 
     /**
@@ -58,7 +61,7 @@ public function create()
 
         // 4. SAVE REFLECTION (Main Entry)
         $reflection = Reflection::create([
-            'student_id' => Auth::id(),
+            'user_id' => Auth::id(),
             'title' => $request->title,
             'narrative' => json_encode($narrativeData), // Save as JSON
             'r_quality_score' => $qualityScore,
