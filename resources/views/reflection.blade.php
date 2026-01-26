@@ -121,6 +121,46 @@
                     <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
                 </div>
             </form>
+
+        </div>
+
+            <div class="mt-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Past Entries</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @forelse($reflections as $reflection)
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-200">
+                        <div class="flex justify-between items-start mb-4">
+
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                {{ $reflection->skillAssessments->first()->skill->name ?? 'Unspecified Skill' }}
+                            </span>
+
+                            <span class="text-xs text-gray-500">
+                                {{ $reflection->created_at->format('M d, Y') }}
+                            </span>
+                        </div>
+                        
+                        <h4 class="text-lg font-bold text-gray-900 mb-2 truncate" title="{{ $reflection->title }}">
+                            {{ $reflection->title }}
+                        </h4>
+                        
+                        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                            <div class="text-sm text-gray-600">
+                                <span class="font-bold text-gray-900">{{ $reflection->skillAssessments->first()->self_score ?? '-' }}/5</span> Self Score
+                            </div>
+
+                            <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
+                        </div>
+                    </div>
+                @empty
+
+                    <div class="col-span-full bg-white rounded-lg p-10 text-center border-2 border-dashed border-gray-300">
+                        <p class="text-gray-500 italic mb-2">You haven't submitted any reflections yet.</p>
+                        <p class="text-sm text-gray-400">Click the button above to add your first entry.</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
 
     </div>
