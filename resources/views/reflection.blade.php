@@ -26,16 +26,7 @@
 </head>
 <body class="bg-gray-100"> 
 
-@if ($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong class="font-bold">Whoops! Something went wrong.</strong>
-        <ul class="mt-2 list-disc list-inside">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+
 
 
     @include('layouts.public-nav')
@@ -55,6 +46,13 @@
             </button>
         </div>
 
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        @endif
+
 
         <div class="center hideform">
             <div style="overflow: auto; margin-bottom: 20px;">
@@ -69,16 +67,21 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Title</label>
-                        <input type="text" name="title" required class="w-full rounded border-gray-300">
+                        <input type="text" name="title" value="{{ old('title') }}" 
+                               class="w-full rounded border-gray-300 @error('title') border-red-500 @enderror">
+                        @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Skill</label>
-                        <select name="skill_id" required class="w-full rounded border-gray-300">
+                        <select name="skill_id" class="w-full rounded border-gray-300 @error('skill_id') border-red-500 @enderror">
                             <option value="">Select...</option>
                             @foreach($skills as $skill)
-                                <option value="{{ $skill->id }}">{{ $skill->name }}</option>
+                                <option value="{{ $skill->id }}" {{ old('skill_id') == $skill->id ? 'selected' : '' }}>
+                                    {{ $skill->name }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('skill_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -86,19 +89,23 @@
                 <div class="space-y-3 mb-4">
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Situation</label>
-                        <textarea name="situation" rows="2" required class="w-full rounded border-gray-300" placeholder="Context..."></textarea>
+                        <textarea  name="situation" rows="2" required class="w-full rounded border-gray-300" placeholder="Context...">{{ old('situation') }}</textarea>
+                        @error('situation') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-indigo-700">Action (You)</label>
-                        <textarea name="action" rows="3" required class="w-full rounded border-indigo-200 bg-indigo-50" placeholder="Your specific actions..."></textarea>
+                        <textarea name="action" rows="3" required class="w-full rounded border-indigo-200 bg-indigo-50" placeholder="Your specific actions...">{{ old('action') }}</textarea>
+                        @error('action') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Result</label>
-                        <textarea name="result" rows="2" required class="w-full rounded border-gray-300" placeholder="Outcome..."></textarea>
+                        <textarea value="{{ old('result') }}" name="result" rows="2" required class="w-full rounded border-gray-300" placeholder="Outcome...">{{ old('result') }}</textarea>
+                        @error('result') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Analysis (What did you learn?)</label>
-                        <textarea name="analysis" rows="2" required class="w-full rounded border-gray-300" placeholder="If you did this again, what would you do differently?"></textarea>
+                        <textarea value="{{ old('analysis') }}" name="analysis" rows="2" required class="w-full rounded border-gray-300" placeholder="If you did this again, what would you do differently?">{{ old('analysis') }}</textarea>
+                        @error('analysis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
 
@@ -106,11 +113,11 @@
                 <div class="grid grid-cols-2 gap-4 mb-4 items-end">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Self Score (1-5)</label>
-                        <input type="number" name="self_score" min="1" max="5" required class="w-full rounded border-gray-300">
+                        <input value="{{ old('self_score') }}" type="number" name="self_score" min="1" max="5" required class="w-full rounded border-gray-300">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Supervisor Email</label>
-                        <input type="email" name="supervisor_email" required class="w-full rounded border-gray-300">
+                        <input value="{{ old('supervisor_email') }}"type="email" name="supervisor_email" required class="w-full rounded border-gray-300">
                     </div>
                 </div>
 
@@ -168,6 +175,11 @@
 
     <script>
         $(document).ready(function() {
+            @if ($errors->any())
+                $('.center').show();
+                $('#show').hide();
+            @endif
+        
 
             $('#show').on('click', function () {
                 $('.center').fadeIn(); 
