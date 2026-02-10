@@ -1,4 +1,3 @@
-<!-- Reflection Page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,22 +129,22 @@
             </form>
 
         </div>
-
             <div class="mt-8">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Past Entries</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($reflections as $reflection)
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-200">
+
                         <div class="flex justify-between items-start mb-4">
 
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                                 {{ $reflection->skillAssessments->first()->skill->name ?? 'Unspecified Skill' }}
                             </span>
-
                             <span class="text-xs text-gray-500">
                                 {{ $reflection->created_at->format('M d, Y') }}
                             </span>
+
                         </div>
                         
                         <h4 class="text-lg font-bold text-gray-900 mb-2 truncate" title="{{ $reflection->title }}">
@@ -156,9 +155,18 @@
                             <div class="text-sm text-gray-600">
                                 <span class="font-bold text-gray-900">{{ $reflection->skillAssessments->first()->self_score ?? '-' }}/5</span> Self Score
                             </div>
-
                             <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
                         </div>
+                            <!-- DELETE FORM START -->
+                            <form action="{{ route('reflection.delete', $reflection->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                @csrf                <!-- Security Token -->
+                                @method('DELETE')    <!-- This tells Laravel: "Treat this POST as a DELETE" -->
+
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition">
+                                    Delete
+                                </button>
+                            </form>
+                            <!-- DELETE FORM END -->
                     </div>
                 @empty
 

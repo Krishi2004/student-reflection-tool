@@ -13,10 +13,11 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-Route::get('/reflection', [ReflectionController::class, 'create'])->middleware(['auth', 'verified'])->name('reflections.create');
+
+Route::get('/reflection', [ReflectionController::class, 'create'])->middleware(['auth', 'verified'])->name('reflection');
 Route::middleware(['auth'])->group(function () {
-    Route::get('/reflections/create', [ReflectionController::class, 'create'])->name('reflections.create');
     Route::post('/reflection', [ReflectionController::class, 'store'])->name('reflections.store');
+    Route::delete('/reflection/{reflection}', [ReflectionController::class, 'deleteReflection'])->name('reflection.delete');
 });
 
 Route::middleware('auth')->group(function () {
