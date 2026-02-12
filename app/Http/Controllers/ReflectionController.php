@@ -40,6 +40,52 @@ public function create()
     return view('reflection', compact('skills','reflections')); 
 }
 
+public function edit(Reflection $reflection)
+{
+
+    $skills = Skill::all();
+
+    $narrative = $reflection->narrative;
+
+
+    if (is_string($narrative)) {
+        $narrative = json_decode($narrative, true);
+    }
+
+
+    if (is_string($narrative)) {
+        $narrative = json_decode($narrative, true);
+    }
+
+
+    if (!is_array($narrative)) {
+        $narrative = [];
+    }
+
+    return view('reflection_edit', compact('skills', 'reflection', 'narrative'));
+}
+
+public function update(Request $request, Reflection $reflection)
+ {
+
+    $reflection->update([
+        'title' => $request->title,
+        'narrative' => [
+            'situation' => $request->situation,
+            'action' => $request->action,
+            'result' => $request->result,
+            'analysis' => $request->analysis,
+        ],
+    ]);
+
+    $reflection->skillAssessments()->first()->update([
+        'skill_id' =>$request->skill_id,
+        'self_score' => $request->self_score,
+        'verifier_email' => $request->supervisor_email,
+    ]);
+    return redirect()->route('reflection')->with('success');
+}
+
     /**
      * Store a newly created reflection in storage.
      */

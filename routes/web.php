@@ -20,6 +20,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/reflection/{reflection}', [ReflectionController::class, 'deleteReflection'])->name('reflection.delete');
 });
 
+
+Route::get('/reflection_edit/{reflection}', [ReflectionController::class, 'edit'])->middleware(['auth', 'verified'])->name('reflection_edit');
+Route::put('/reflection_edit/{reflection}', [ReflectionController::class, 'update'])->name('reflection.update');
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

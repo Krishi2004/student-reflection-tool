@@ -157,16 +157,19 @@
                             </div>
                             <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
                         </div>
-                            <!-- DELETE FORM START -->
+                        <div class="flex items-center gap-2">
+                            <a href="/reflection_edit/{{ $reflection->id }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm transition">Edit</a>
+
                             <form action="{{ route('reflection.delete', $reflection->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                                @csrf                <!-- Security Token -->
-                                @method('DELETE')    <!-- This tells Laravel: "Treat this POST as a DELETE" -->
+                                @csrf             
+                                @method('DELETE')  
 
                                 <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition">
                                     Delete
                                 </button>
                             </form>
-                            <!-- DELETE FORM END -->
+                        </div>
+
                     </div>
                 @empty
 
