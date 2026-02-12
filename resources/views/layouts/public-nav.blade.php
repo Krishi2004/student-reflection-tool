@@ -13,7 +13,7 @@
                 <!-- If LOGGED IN, show Dashboard and Logout -->
                 <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Dashboard</a>
                 <a href="{{ route('reflection') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Reflections</a>
-                <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Goals</a>
+                <a href="{{ route('goals') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Goals</a>
                 <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Analytics</a>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
