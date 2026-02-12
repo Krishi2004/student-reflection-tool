@@ -17,6 +17,10 @@ class Reflection extends Model
         'template_used',
     ];
 
+    protected $casts = [
+        'narrative' => 'array',
+    ];
+
     // Relationship to User
     public function student()
     {

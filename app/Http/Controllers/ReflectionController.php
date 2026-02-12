@@ -6,12 +6,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Skill; 
 use App\Models\Reflection; 
-use App\Models\SkillAssessment; 
+use App\Models\SkillAssessment;
+use League\CommonMark\Extension\Attributes\Node\Attributes;
+use function PHPUnit\Framework\returnArgument; 
 class ReflectionController extends Controller
 {
     /**
      * Show the form for creating a new reflection.
      */
+    public function deleteReflection(Reflection $reflection) {
+        if (auth()->id() !== $reflection->user_id) {
+            abort(403, 'unauthorised action');
+
+        }
+        $reflection->delete();
+        return redirect()->route('reflection')->with('success', 'Reflection deleted');
+    }
+
+    
 
 
 public function create()
@@ -26,6 +38,52 @@ public function create()
 
 
     return view('reflection', compact('skills','reflections')); 
+}
+
+public function edit(Reflection $reflection)
+{
+
+    $skills = Skill::all();
+
+    $narrative = $reflection->narrative;
+
+
+    if (is_string($narrative)) {
+        $narrative = json_decode($narrative, true);
+    }
+
+
+    if (is_string($narrative)) {
+        $narrative = json_decode($narrative, true);
+    }
+
+
+    if (!is_array($narrative)) {
+        $narrative = [];
+    }
+
+    return view('reflection_edit', compact('skills', 'reflection', 'narrative'));
+}
+
+public function update(Request $request, Reflection $reflection)
+ {
+
+    $reflection->update([
+        'title' => $request->title,
+        'narrative' => [
+            'situation' => $request->situation,
+            'action' => $request->action,
+            'result' => $request->result,
+            'analysis' => $request->analysis,
+        ],
+    ]);
+
+    $reflection->skillAssessments()->first()->update([
+        'skill_id' =>$request->skill_id,
+        'self_score' => $request->self_score,
+        'verifier_email' => $request->supervisor_email,
+    ]);
+    return redirect()->route('reflection')->with('success');
 }
 
     /**
@@ -45,8 +103,10 @@ public function create()
             'result' => 'required|string|min:20',
             'analysis' => 'required|string|min:20',
         ]);
+    
+  
 
-        // 2. COMBINE STAR DATA INTO JSON
+
         $narrativeData = [
             'situation' => $request->situation,
             'action' => $request->action,
@@ -54,21 +114,22 @@ public function create()
             'analysis' => $request->analysis
         ];
 
-        // 3. CALCULATE QUALITY SCORE (RQS)
-        // Simple logic: 1 point for every 50 words, capped at 5.0
+
         $totalWords = str_word_count($request->situation . $request->action . $request->result . $request->analysis);
         $qualityScore = min(5.0, round($totalWords / 50, 2));
 
-        // 4. SAVE REFLECTION (Main Entry)
+
         $reflection = Reflection::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
-            'narrative' => json_encode($narrativeData), // Save as JSON
+            'narrative' => json_encode($narrativeData),
             'r_quality_score' => $qualityScore,
             'template_used' => 'STAR'
         ]);
 
-        // 5. SAVE ASSESSMENT (The Pivot/Score)
+
+
+
         SkillAssessment::create([
             'reflection_id' => $reflection->id,
             'skill_id' => $request->skill_id,
@@ -77,7 +138,7 @@ public function create()
             'is_verified' => false,
         ]);
 
-        // 6. REDIRECT
+
         return redirect()->route('dashboard')->with('success', 'Reflection submitted successfully!');
     }
 }
