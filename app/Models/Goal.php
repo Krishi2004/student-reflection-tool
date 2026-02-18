@@ -14,6 +14,10 @@ class Goal extends Model
         'skill_id',
         'target_score',
         'status',
+        'title',
+        'user_id',
+        'description',
+        'deadline',
     ];
 
     // Relationship: A Goal belongs to a Student
