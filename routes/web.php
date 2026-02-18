@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\ProfileController;
+use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReflectionController;
 
@@ -31,8 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/goals', function() {
-    return view('goals');
-})->middleware(['auth', 'verified'])->name('goals');
+Route::get('/goals', [GoalsController::class, 'create'])->middleware(['auth', 'verified'])->name('goals');
+Route::middleware(['auth'])->group(function() {
+    Route::post('/goals', [GoalsController::class, 'store'])->name('goals');
+});
 
 require __DIR__.'/auth.php';
