@@ -39,7 +39,7 @@ public function store(Request $request)
             'user_id' => Auth::id(),
             'skill_id' => $request->skill_id,
             'target_score' => $request->target_score,
-            'status' => 'in_progress',
+            'status' => 'In Progress',
             'title' => $request->title,
             'deadline' => $request->deadline,
             'description' => $request->description,

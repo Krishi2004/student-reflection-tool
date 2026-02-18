@@ -117,7 +117,7 @@
 
                         <span
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {{ $goal->skill->skill->name ?? 'Unspecified Skill' }}
+                            {{ $goal->skill->name ?? 'Unspecified Skill' }}
                         </span>
                         <span class="text-xs text-gray-500">
                             {{ $goal->created_at->format('M d, Y') }}
@@ -131,6 +131,7 @@
 
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                         <div class="text-sm text-gray-600">
+                            <span class="text-gray-900">Target Score:</span>
                             <span class="font-bold text-gray-900">
                                 {{ $goal->target_score }}
                             </span>
