@@ -20,6 +20,10 @@ class Goal extends Model
         'deadline',
     ];
 
+    public static function getStatus() {
+        return ['In Progress', 'Completed', 'Abandoned'];
+    }
+
     // Relationship: A Goal belongs to a Student
     public function student()
     {

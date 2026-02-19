@@ -48,4 +48,38 @@ public function store(Request $request)
 
         return redirect()->route('goals')->with('success', 'Goal submitted successfully!');
     }
+
+    public function update(Request $request, Goal $goal)
+ {
+    
+    $goal->update([
+        'title' => $request->title,
+        'description' => $request->description,
+        'deadline' => $request->deadline,
+        'target_score' => $request->target_score,
+        'status' => $request->status,
+        
+        
+
+    ]);
+
+    return redirect()->route('goals')->with('success');
+}
+
+public function edit(Goal $goal)
+{
+
+    $skills = Skill::all();
+
+    return view('goals_edit', compact('skills', 'goal'));
+}
+
+    public function deleteGoal(Goal $goal) {
+        if (auth()->id() !== $goal->user_id) {
+            abort(403, 'unauthorised action');
+
+        }
+        $goal->delete();
+        return redirect()->route('goals')->with('success', 'Goal deleted');
+    }
 }

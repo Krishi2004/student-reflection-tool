@@ -45,7 +45,8 @@
         <div id='createmodal' class="center hideform">
             <div style="overflow: auto; margin-bottom: 20px;">
                 <h2 class="float-left text-lg font-bold">New Goal</h2>
-                <button id="close" style="float: right;" class="text-gray-500 hover:text-red-500 font-bold">X</button>
+                <button id="close-view" style="float: right;"
+                    class="close-modal-btn text-gray-500 hover:text-red-500 font-bold">X</button>
             </div>
 
             <form action="{{ route('goals.store') }}" method="POST">
@@ -99,8 +100,8 @@
 
                 <div class="flex justify-end space-x-3 pt-4 border-t">
 
-                    <button type="button" id="cancelBtn"
-                        class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
+                    <button type="button"
+                        class=" close-modal-btnpx-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
                     <button type="submit"
                         class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
                 </div>
@@ -139,14 +140,13 @@
                             </div>
                             <span class="text-xs text-orange-500 font-semibold">{{ $goal->status }}</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">
                             <button onclick="openViewModal({{ $goal->id }})"
                                 class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">
                                 View Details
                             </button>
 
                         </div>
-
                     </div>
                 @empty
 
@@ -157,49 +157,67 @@
                 @endforelse
             </div>
         </div>
-        <div id="viewModal" class="center hideform">
-            <div style="overflow: auto; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                <h2 id="view-title" class="float-left text-xl font-bold text-gray-900">Goal Title</h2>
-                <button id="closeView" style="float: right;"
-                    class="text-gray-500 hover:text-red-500 font-bold">X</button>
-            </div>
+        @foreach ($goals as $goal)
 
-            <div class="mb-4">
-                <span id="view-skill"
-                    class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Skill
-                    Name</span>
-                <span id="view-status" class="ml-2 border px-2 py-0.5 rounded text-xs font-bold uppercase">Status</span>
-            </div>
 
-            <div class="mb-6">
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Action
-                    Plan</label>
-                <div id="view-desc" class="text-gray-700 bg-gray-50 p-4 rounded border border-gray-200 leading-relaxed">
+            <div id="viewModal-{{ $goal->id }}" class="center hideform">
+                <div style="overflow: auto; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <h2 id="view-title" class="float-left text-xl font-bold text-gray-900">{{ old('title', $goal->title) }}
+                    </h2>
+                    <button id="closeView" style="float: right;"
+                        class="text-gray-500 hover:text-red-500 font-bold">X</button>
+                </div>
+
+                <div class="mb-4">
+
+                    <span id="view-status" class="ml-2 border px-2 py-0.5 rounded text-xs font-bold uppercase">Skill Name:
+                        {{ $goal->skill->name ?? 'Unspecified Skill' }}</span>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Action
+                        Plan</label>
+
+                    <div id="view-desc" class="text-gray-700 bg-gray-50 p-4 rounded border border-gray-200 leading-relaxed">
+                        <span id="view-description"
+                            class="text-lg font-bold text-gray-900">{{ old('description', $goal->description) }}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gray-50 p-3 rounded border">
+                        <span class="block text-xs text-gray-500">Target Score</span>
+                        <span id="view-target"
+                            class="text-lg font-bold text-gray-900">{{ old('target_score', $goal->target_score) }}</span>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded border">
+                        <span class="block text-xs text-gray-500">Deadline</span>
+                        <span id="view-deadline"
+                            class="text-lg font-bold text-gray-900">{{ old('deadline', $goal->deadline) }}</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+
+                    <button type="button" onclick="$('#viewModal-{{ $goal->id }}').fadeOut(); $('#show').fadeIn();"
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
+
+                    <!-- We can dynamically update these links later if needed -->
+                    <a id="view-edit-btn" href="{{ route('goals.edit', $goal->id) }}"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Edit</a>
+                    <form action="{{ route('goal.delete', $goal->id) }}" method="POST"
+                        onsubmit="return confirm('Are you sure?');">
+                        @csrf
+                        @method('DELETE')
+
+                        <button type="submit"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">
+                            Delete
+                        </button>
+                    </form>
                 </div>
             </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="bg-gray-50 p-3 rounded border">
-                    <span class="block text-xs text-gray-500">Target Score</span>
-                    <span id="view-target" class="text-lg font-bold text-gray-900">5/5</span>
-                </div>
-                <div class="bg-gray-50 p-3 rounded border">
-                    <span class="block text-xs text-gray-500">Deadline</span>
-                    <span id="view-deadline" class="text-lg font-bold text-gray-900">Jan 1, 2026</span>
-                </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 pt-4 border-t">
-                <button type="button" id="closeViewBtn"
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Close</button>
-
-                <!-- We can dynamically update these links later if needed -->
-                <a id="view-edit-btn" href="#"
-                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Edit</a>
-                <a id="view-edit-btn" href="#"
-                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Delete</a>
-            </div>
-        </div>
+        @endforeach
 
     </div>
     </div>
@@ -210,8 +228,19 @@
         const goalsData = @json($goals);
 
         $(document).ready(function () {
+
+            $('.close-modal-btn').on('click', function (e) {
+                e.preventDefault();
+
+                // Find the specific modal this button is inside of and fade it out
+                $(this).closest('.center').fadeOut();
+
+                // Bring back the "Add New" button
+                $('#show').fadeIn();
+            });
+
             @if ($errors->any())
-                $('#createmodal').fadeIn();
+                $('#createmodal').show();
                 $('#show').hide();
             @endif
 
@@ -221,6 +250,7 @@
                 $(this).hide();
             });
 
+
             $('#close, #cancelBtn').on('click', function (e) {
                 e.preventDefault();
                 $('#createmodal').fadeOut();
@@ -228,30 +258,20 @@
             });
 
 
-            $('#closeView, #closeViewBtn').on('click', function (e) {
+            $('.close-view, .close-view-btn').on('click', function (e) {
                 e.preventDefault();
-                $('#viewModal').fadeOut();
+
+                $(this).closest('.center').fadeOut();
                 $('#show').fadeIn();
             });
         });
 
 
         function openViewModal(id) {
-            const goal = goalsData.find(g => g.id === id);
-            if (goal) {
-                $('#view-title').text(goal.title);
-                $('#view-desc').text(goal.description);
-                $('#view-target').text(goal.target_score + '/5');
-                $('#view-deadline').text(goal.deadline);
-                $('#view-skill').text(goal.skill ? goal.skill.name : 'Skill');
-                $('#view-status').text(goal.status);
-
-                $('#viewModal').fadeIn();
-                $('#show').hide();
-            }
+            $('#viewModal-' + id).fadeIn();
+            $('#show').hide();
         }
     </script>
-
 
 
 </body>
