@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/goals', [GoalsController::class, 'create'])->middleware(['auth', 'verified'])->name('goals');
 Route::middleware(['auth'])->group(function() {
-    Route::post('/goals', [GoalsController::class, 'store'])->name('goals');
+    Route::post('/goals', [GoalsController::class, 'store'])->name('goals.store');
 });
 
 require __DIR__.'/auth.php';

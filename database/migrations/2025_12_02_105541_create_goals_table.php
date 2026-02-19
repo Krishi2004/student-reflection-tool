@@ -30,7 +30,7 @@ return new class extends Migration
             $table->decimal('target_score', 3, 1)->default(5.0); 
             
             // Your custom status list
-            $table->enum('status', ['in_progress', 'achieved', 'archived'])->default('in_progress');
+            $table->enum('status', ['In Progress', 'Completed', 'Abandoned'])->default('In Progress');
             
             $table->timestamps();
         });
