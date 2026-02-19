@@ -194,7 +194,10 @@
                     class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Close</button>
 
                 <!-- We can dynamically update these links later if needed -->
-                <!-- <a id="view-edit-btn" href="#" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Edit</a> -->
+                <a id="view-edit-btn" href="#"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Edit</a>
+                <a id="view-edit-btn" href="#"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Delete</a>
             </div>
         </div>
 
