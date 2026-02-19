@@ -75,7 +75,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Skill</label>
-                        <select name="skill_id"
+                        <select name="skill_id" id="skill_id_select"
                             class="w-full rounded border-gray-300 @error('skill_id') border-red-500 @enderror">
                             <option value="">Select...</option>
                             @foreach($skills as $skill)
@@ -175,6 +175,9 @@
                             </div>
                             <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
                         </div>
+                        <div class="flex gap-2">
+
+                        </div><br>
                         <div class="flex items-center gap-2">
                             <a href="/reflection_edit/{{ $reflection->id }}"
                                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm transition">Edit</a>
@@ -189,6 +192,10 @@
                                     Delete
                                 </button>
                             </form>
+                            <button type="button" onclick="LevelUp({{ $reflection->skillAssessments->first()->skill_id ?? '' }})"
+                                class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-bold py-1 px-2 rounded transition">
+                                + Level Up
+                            </button>
                         </div>
 
                     </div>
@@ -230,7 +237,15 @@
                 $('.center').fadeOut();
                 $('#show').fadeIn();
             });
+
+
         });
+        function LevelUp(skillId) {
+            $('#skill_id_select').val(skillId);
+            $('.center').fadeIn();
+            $('#show').hide();
+            $('input[name="title"]').focus();
+        }
     </script>
 
 </body>
