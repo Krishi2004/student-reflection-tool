@@ -48,12 +48,7 @@
             </button>
         </div>
 
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Success!</strong>
-                <span class="block sm:inline">{{ session('success') }}</span>
-            </div>
-        @endif
+
 
 
         <div class="center hideform">
@@ -116,14 +111,20 @@
                             placeholder="If you did this again, what would you do differently?">{{ old('analysis') }}</textarea>
                         @error('analysis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
-                </div>
+                
 
 
                 <div class="grid grid-cols-2 gap-4 mb-4 items-end">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Self Score (1-5)</label>
-                        <input value="{{ old('self_score') }}" type="number" name="self_score" min="1" max="5" required
-                            class="w-full rounded border-gray-300">
+                    <div class="bg-gray-50 p-3 rounded border">
+                        <label class="block text-sm font-medium text-gray-700">Self Score</label>
+                        <input id='scoreRange' type="range" value="{{ old('self_score', 3) }}" name="self_score" min="1" max="5"
+                            required
+                            class="w-full h-2 bg-gray-300 rounded-1g appearance-none cursor-pointer accent-indigo-600">
+
+                        <div class="flex justify-between items-center mt-2">
+                            <span id="scoreValue" class="text-2x1 font-bold text-indigo-600">3</span>
+                            <span id="scoreLabel" class="text-2x1 font-bold text-indigo-600">Competent</span>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Supervisor Email</label>
@@ -131,83 +132,95 @@
                             class="w-full rounded border-gray-300">
                     </div>
                 </div>
+                
 
 
-                <div class="flex justify-end space-x-3 pt-4 border-t">
-
-                    <button type="button" id="cancelBtn"
-                        class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
-                    <button type="submit"
-                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                        <button type="button" id="cancelBtn"
+                            class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
+                        <button type="submit"
+                            class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
                 </div>
             </form>
-
         </div>
-        <div class="mt-8">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Past Entries</h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($reflections as $reflection)
-                    <div
-                        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-200">
+    </div>
+    <div class="mt-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Past Entries</h3>
 
-                        <div class="flex justify-between items-start mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($reflections as $reflection)
+                <div
+                    class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-200">
 
+                    <div class="flex justify-between items-start mb-4">
+
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {{ $reflection->skillAssessments->first()->skill->name ?? 'Unspecified Skill' }}
+                        </span>
+                        <span class="text-xs text-gray-500">
+                            {{ $reflection->created_at->format('M d, Y') }}
+                        </span>
+
+                    </div>
+
+                    <h4 class="text-lg font-bold text-gray-900 mb-2 truncate" title="{{ $reflection->title }}">
+                        {{ $reflection->title }}
+                    </h4>
+                    <div class="flex flex-col mt-4 pt-4 border-t border-gray-100">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Proficiency</span>
                             <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                {{ $reflection->skillAssessments->first()->skill->name ?? 'Unspecified Skill' }}
-                            </span>
-                            <span class="text-xs text-gray-500">
-                                {{ $reflection->created_at->format('M d, Y') }}
-                            </span>
-
+                                class="text-xs font-bold text-indigo-600">{{ $reflection->skillAssessments->first()->self_score ?? 0 }}/5</span>
                         </div>
-
-                        <h4 class="text-lg font-bold text-gray-900 mb-2 truncate" title="{{ $reflection->title }}">
-                            {{ $reflection->title }}
-                        </h4>
-
-                        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                            <div class="text-sm text-gray-600">
-                                <span
-                                    class="font-bold text-gray-900">{{ $reflection->skillAssessments->first()->self_score ?? '-' }}/5</span>
-                                Self Score
-                            </div>
-                            <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
+                        <div class="flex gap-1 h-1.5 w-full">
+                            @php $score = $reflection->skillAssessments->first()->self_score ?? 0; @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <div class="flex-1 rounded-full {{ $score >= $i ? 'bg-indigo-500' : 'bg-gray-200' }}"></div>
+                            @endfor
                         </div>
-                        <div class="flex gap-2">
+                    </div>
 
-                        </div><br>
-                        <div class="flex items-center gap-2">
-                            <a href="/reflection_edit/{{ $reflection->id }}"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm transition">Edit</a>
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                        <div class="text-sm text-gray-600">
+                        </div>
+                        <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
+                    </div>
+                    <div class="flex gap-2">
 
-                            <form action="{{ route('reflection.delete', $reflection->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure?');">
-                                @csrf
-                                @method('DELETE')
+                    </div><br>
+                    <div class="flex items-center gap-2">
+                        <a href="/reflection_edit/{{ $reflection->id }}"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm transition">Edit</a>
 
-                                <button type="submit"
-                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition">
-                                    Delete
-                                </button>
-                            </form>
-                            <button type="button" onclick="LevelUp({{ $reflection->skillAssessments->first()->skill_id ?? '' }})"
-                                class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-bold py-1 px-2 rounded transition">
-                                + Level Up
+                        <form action="{{ route('reflection.delete', $reflection->id) }}" method="POST"
+                            onsubmit="return confirm('Are you sure?');">
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit"
+                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition">
+                                Delete
                             </button>
-                        </div>
-
+                        </form>
+                        <button type="button"
+                            onclick="LevelUp({{ $reflection->skillAssessments->first()->skill_id ?? '' }})"
+                            class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-bold py-1 px-2 rounded transition">
+                            + Level Up
+                        </button>
                     </div>
-                @empty
 
-                    <div class="col-span-full bg-white rounded-lg p-10 text-center border-2 border-dashed border-gray-300">
-                        <p class="text-gray-500 italic mb-2">You haven't submitted any reflections yet.</p>
-                        <p class="text-sm text-gray-400">Click the button above to add your first entry.</p>
-                    </div>
-                @endforelse
-            </div>
+                </div>
+            @empty
+
+                <div class="col-span-full bg-white rounded-lg p-10 text-center border-2 border-dashed border-gray-300">
+                    <p class="text-gray-500 italic mb-2">You haven't submitted any reflections yet.</p>
+                    <p class="text-sm text-gray-400">Click the button above to add your first entry.</p>
+                </div>
+            @endforelse
         </div>
+    </div>
 
     </div>
 
@@ -236,6 +249,15 @@
             $('#cancelBtn').on('click', function () {
                 $('.center').fadeOut();
                 $('#show').fadeIn();
+            });
+
+            const labels = {1: 'Starter', 2: 'Beginner', 3: 'Intermediate', 4: 'Advanced', 5: 'Expert'};
+            $('#scoreRange').on('input', function() {
+                const val = $(this).val();
+                $('#scoreValue').text(val);
+                $('#scoreLabel').text(labels[val]);
+                const colorClass = val <= 2 ? 'text-red-500' : (val == 3 ? 'text-orange-500' : 'text-green-600');
+                $('#scoreValue').removeClass('text-red-500 text-orange-500 text-green-600 text-indigo-600').addClass(colorClass);
             });
 
 
