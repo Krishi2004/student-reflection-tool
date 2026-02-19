@@ -14,7 +14,7 @@
                 <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Dashboard</a>
                 <a href="{{ route('reflection') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Reflections</a>
                 <a href="{{ route('goals') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Goals</a>
-                <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Analytics</a>
+                <a href="{{ route('analytics') }}" class="text-indigo-600 hover:text-indigo-800 px-3 font-semibold">Analytics</a>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-150 shadow-md">

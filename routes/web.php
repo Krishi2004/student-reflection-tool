@@ -43,4 +43,10 @@ Route::get('/goals_edit/{goal}', [GoalsController::class, 'edit'])->middleware([
 Route::put('/goals_edit/{goal}', [GoalsController::class, 'update'])->middleware(['auth', 'verified'])->name('goals.update');
 Route::delete('/goal/{goal}', [GoalsController::class, 'deleteGoal'])->name('goal.delete');
 
+
+Route::get('/analytics', function() {
+    return view('analytics');
+})->middleware(['auth', 'verified'])->name('analytics');
+
+
 require __DIR__.'/auth.php';
