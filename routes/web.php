@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\ProfileController;
 use GuzzleHttp\Middleware;
@@ -44,9 +45,7 @@ Route::put('/goals_edit/{goal}', [GoalsController::class, 'update'])->middleware
 Route::delete('/goal/{goal}', [GoalsController::class, 'deleteGoal'])->name('goal.delete');
 
 
-Route::get('/analytics', function() {
-    return view('analytics');
-})->middleware(['auth', 'verified'])->name('analytics');
+Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
 
 
 require __DIR__.'/auth.php';
