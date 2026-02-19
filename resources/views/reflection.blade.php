@@ -170,7 +170,7 @@
                     </h4>
                     <div class="flex flex-col mt-4 pt-4 border-t border-gray-100">
                         <div class="flex justify-between items-end mb-1">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">Proficiency</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Self Score</span>
                             <span
                                 class="text-xs font-bold text-indigo-600">{{ $reflection->skillAssessments->first()->self_score ?? 0 }}/5</span>
                         </div>
