@@ -45,7 +45,8 @@ Route::put('/goals_edit/{goal}', [GoalsController::class, 'update'])->middleware
 Route::delete('/goal/{goal}', [GoalsController::class, 'deleteGoal'])->name('goal.delete');
 
 
-Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
+//Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
+Route::get('/analytics', [AnalyticsController::class, 'lineChart'])->name('analytics');
 
 
 require __DIR__.'/auth.php';
