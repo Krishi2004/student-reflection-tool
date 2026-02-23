@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="bg-gray-50">
 
     @include('layouts.public-nav')
@@ -22,6 +24,34 @@
                 <p class="text-sm text-gray-500">Go write some reflections to start tracking your growth!</p>
             </div>
         @else
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-2x1 p-6 shadow-sm border-gray-200 flex items-center transition hover:shadow-md">
+                    <div class="bg-indigo-100 p-4 rounded-x1 text-indigo-600 text-2x1 mr-4">📝</div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Reflections</p>
+                        <p class="text-3x1 font-black text-gray-900">{{ $totalReflections }}</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex items-center transition hover:shadow-md">
+                    <div class="bg-emerald-100 p-4 rounded-xl text-emerald-600 text-2xl mr-4">🏆</div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Top Skill (Avg)</p>
+                        <p class="text-xl font-black text-gray-900 truncate">{{ $topSkill }}</p>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex items-center transition hover:shadow-md">
+                    <div class="bg-amber-100 p-4 rounded-xl text-amber-600 text-2xl mr-4">🔥</div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Most Practiced</p>
+                        <p class="text-xl font-black text-gray-900 truncate">{{ $mostPracticedSkill }}</p>
+                    </div>
+                </div>
+            </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
 
                 <!-- THE SKILL DROPDOWN FILTER -->
@@ -37,12 +67,14 @@
                 </div>
 
                 <!-- GAMIFIED BANNER (Shows if they only have 1 reflection) -->
-                <div id="singlePointWarning" style="display: none;" class="mb-6 bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg shadow-sm">
+                <div id="singlePointWarning" style="display: none;"
+                    class="mb-6 bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg shadow-sm">
                     <div class="flex items-center">
                         <div class="text-indigo-500 text-2xl mr-3">💡</div>
                         <div>
                             <p class="text-sm text-indigo-800 font-bold">Tracking Started!</p>
-                            <p class="text-xs text-indigo-600">You have logged your first reflection for this skill (shown as a dot). <strong>Log another reflection to unlock your growth line!</strong></p>
+                            <p class="text-xs text-indigo-600">You have logged your first reflection for this skill (shown
+                                as a dot). <strong>Log another reflection to unlock your growth line!</strong></p>
                         </div>
                     </div>
                 </div>
@@ -53,11 +85,12 @@
                 </div>
 
                 <!-- THE "NO DATA" MESSAGE -->
-                <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;" class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
+                    class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                     <div class="text-5xl mb-3">🤷‍♂️</div>
                     <p class="text-lg font-bold text-gray-700">No reflections logged for this skill yet.</p>
                     <p class="text-sm">Once you add a reflection for this skill, your growth graph will appear here.</p>
-                    
+
                     <!-- DEBUGGER TOOL: This will tell us exactly why it failed if it fails -->
                     <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono"></p>
                 </div>
@@ -70,7 +103,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             @if(!empty($chartData))
-                const rawData = {!! json_encode((object)$chartData) !!};
+                const rawData = {!! json_encode((object) $chartData) !!};
                 const dropdown = document.getElementById('skillDropdown');
                 const chartWrapper = document.getElementById('chartWrapper');
                 const noDataWrapper = document.getElementById('noDataWrapper');
@@ -118,14 +151,14 @@
                     if (rawSelected !== 'all' && !selectedSkill) {
                         chartWrapper.style.display = 'none';
                         noDataWrapper.style.display = 'flex';
-                        
+
                         // Print Debug Info to the screen so you can see the glitch
-                        if(debugText) {
+                        if (debugText) {
                             debugText.innerText = `DEBUG -> You searched for: [${rawSelected}]. Database actually has: [${Object.keys(rawData).join(', ')}]`;
                         }
-                        
+
                         if (myChart) myChart.destroy();
-                        return; 
+                        return;
                     }
 
                     // Gamification Check (1 Reflection)
@@ -166,10 +199,10 @@
                                 borderColor: colors[colorIndex % colors.length],
                                 backgroundColor: colors[colorIndex % colors.length],
                                 tension: 0.3,
-                                borderWidth: 4,      
-                                pointRadius: 8, 
+                                borderWidth: 4,
+                                pointRadius: 8,
                                 pointHoverRadius: 12,
-                                spanGaps: true 
+                                spanGaps: true
                             });
                             colorIndex++;
                         }
@@ -213,4 +246,5 @@
         });
     </script>
 </body>
+
 </html>
