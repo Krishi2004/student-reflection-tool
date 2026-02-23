@@ -108,7 +108,6 @@
             </form>
         </div>
         <div class="mt-8">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">My Goals</h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($goals as $goal)
