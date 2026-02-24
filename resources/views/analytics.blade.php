@@ -24,6 +24,42 @@
                 <p class="text-sm text-gray-500">Go write some reflections to start tracking your growth!</p>
             </div>
         @else
+            <div
+                class="bg-gradient-to-r from-indigo-50 to purple-50 rounded-2xl p-6 shadow-sm border border-indigo-100 mb-6 flex items-start transition hover:shadow-md">
+                <div
+                    class="bg-white p-3 rounded-full shadow-sm text-indigo-600 text-xl mr-4 border border-indigo-50 flex-shrink-0">
+                    ✨
+                </div>
+                <div>
+                    <h2 class="text-xs font-black text-indigo-900 uppercase tracking-wider mb-2"> Auto Generated Insights
+                    </h2>
+                    <ul class="text-indigo-800 text-sm space-y-2">
+                        <li>
+                            <strong>Consistency:</strong>You have logged {{ $totalReflections }} reflections so far.
+                            @if ($totalReflections < 3)
+                                You are just getting started—keep logging to unlock deeper trend data!
+                            @elseif($totalReflections >= 3 && $totalReflections < 10)
+                                You are building excellent momentum.
+                            @else
+                                You have built a fantastic habit of self-reflection!
+                            @endif
+                        </li>
+                        <li>
+                            <strong>Standout Strength:</strong> Your highest recorded proficiency is currently in
+                            <strong>{{ $topSkill }}</strong>.
+                        </li>
+                        <li>
+                            <strong>Current Focus:</strong> You are dedicating the majority of your reflection time to
+                            <strong>{{ $mostPracticedSkill }}</strong>.
+                            @if($topSkill !== $mostPracticedSkill)
+                                This focused effort should help pull its score up soon!
+                            @else
+                                You are actively maintaining your strongest asset.
+                            @endif
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div
@@ -72,34 +108,36 @@
                             @endforeach
                         </select>
                     </div>
-                
 
-                <div id="singlePointWarning" style="display: none;"
-                    class="mb-6 bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg shadow-sm">
-                    <div class="flex items-center">
-                        <div class="text-indigo-500 text-2xl mr-3">💡</div>
-                        <div>
-                            <p class="text-sm text-indigo-800 font-bold">Tracking Started!</p>
-                            <p class="text-xs text-indigo-600">You have logged your first reflection for this skill (shown
-                                as a dot). <strong>Log another reflection to unlock your growth line!</strong></p>
+
+                    <div id="singlePointWarning" style="display: none;"
+                        class="mb-6 bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg shadow-sm">
+                        <div class="flex items-center">
+                            <div class="text-indigo-500 text-2xl mr-3">💡</div>
+                            <div>
+                                <p class="text-sm text-indigo-800 font-bold">Tracking Started!</p>
+                                <p class="text-xs text-indigo-600">You have logged your first reflection for this skill
+                                    (shown
+                                    as a dot). <strong>Log another reflection to unlock your growth line!</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chartWrapper" style="position: relative; height: 400px; width: 100%;">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+
+                    <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
+                        class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
+                            class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                            <div class="text-5xl mb-3">🤷‍♂️</div>
+                            <p class="text-lg font-bold text-gray-700">No reflections logged for this skill yet.</p>
+                            <p class="text-sm">Once you add a reflection for this skill, your growth graph will appear here.
+                            </p>
+                            <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono"></p>
                         </div>
                     </div>
                 </div>
-                <div id="chartWrapper" style="position: relative; height: 400px; width: 100%;">
-                    <canvas id="progressChart"></canvas>
-                </div>
-
-                <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
-                    class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                    <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
-                        class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                        <div class="text-5xl mb-3">🤷‍♂️</div>
-                        <p class="text-lg font-bold text-gray-700">No reflections logged for this skill yet.</p>
-                        <p class="text-sm">Once you add a reflection for this skill, your growth graph will appear here.</p>
-                        <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono"></p>
-                    </div>
-                </div>
-            </div>
 
                 <div class="flex flex-col gap-6">
 
