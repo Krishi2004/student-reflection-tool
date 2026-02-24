@@ -25,12 +25,13 @@
             </div>
         @else
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-2x1 p-6 shadow-sm border-gray-200 flex items-center transition hover:shadow-md">
-                    <div class="bg-indigo-100 p-4 rounded-x1 text-indigo-600 text-2x1 mr-4">📝</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div
+                    class="bg-white rounded-2xl p-6 shadow-sm border-gray-200 flex items-center transition hover:shadow-md">
+                    <div class="bg-indigo-100 p-4 rounded-xl text-indigo-600 text-2xl mr-4">📝</div>
                     <div>
                         <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Reflections</p>
-                        <p class="text-3x1 font-black text-gray-900">{{ $totalReflections }}</p>
+                        <p class="text-3xl font-black text-gray-900">{{ $totalReflections }}</p>
                     </div>
                 </div>
 
@@ -43,8 +44,8 @@
                     </div>
                 </div>
 
-
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex items-center transition hover:shadow-md">
+                <div
+                    class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex items-center transition hover:shadow-md">
                     <div class="bg-amber-100 p-4 rounded-xl text-amber-600 text-2xl mr-4">🔥</div>
                     <div class="overflow-hidden">
                         <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Most Practiced</p>
@@ -52,21 +53,27 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
 
-                <!-- THE SKILL DROPDOWN FILTER -->
-                <div class="mb-6 border-b pb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Select a Skill to View:</label>
-                    <select id="skillDropdown"
-                        class="w-full md:w-1/3 p-2 rounded-lg border-gray-300 border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white cursor-pointer">
-                        <option value="all">Compare All Skills</option>
-                        @foreach($skills as $skill)
-                            <option value="{{ $skill->name }}">{{ $skill->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- GAMIFIED BANNER (Shows if they only have 1 reflection) -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-6 border-b pb-4">
+                        <div>
+                            <h2 class="text-lg font-black text-gray-900">
+                                Progress History
+                            </h2>
+                            <p class="text-xs text-gray-500">Select a skill to view your graph timeline</p>
+                        </div>
+                        <select id="skillDropdown"
+                            class="w-full md:w-1/3 p-2 rounded-lg border-gray-300 border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white cursor-pointer">
+                            <option value="all">Compare All Skills</option>
+                            @foreach($skills as $skill)
+                                <option value="{{ $skill->name }}">{{ $skill->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                
+
                 <div id="singlePointWarning" style="display: none;"
                     class="mb-6 bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg shadow-sm">
                     <div class="flex items-center">
@@ -78,32 +85,114 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- THE GRAPH CONTAINER -->
                 <div id="chartWrapper" style="position: relative; height: 400px; width: 100%;">
                     <canvas id="progressChart"></canvas>
                 </div>
 
-                <!-- THE "NO DATA" MESSAGE -->
                 <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
                     class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                    <div class="text-5xl mb-3">🤷‍♂️</div>
-                    <p class="text-lg font-bold text-gray-700">No reflections logged for this skill yet.</p>
-                    <p class="text-sm">Once you add a reflection for this skill, your growth graph will appear here.</p>
+                    <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
+                        class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div class="text-5xl mb-3">🤷‍♂️</div>
+                        <p class="text-lg font-bold text-gray-700">No reflections logged for this skill yet.</p>
+                        <p class="text-sm">Once you add a reflection for this skill, your growth graph will appear here.</p>
+                        <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono"></p>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- DEBUGGER TOOL: This will tell us exactly why it failed if it fails -->
-                    <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono"></p>
+                <div class="flex flex-col gap-6">
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-black text-gray-900 mb-1">Current Skill Profile</h2>
+                        <p class="text-xs text-gray-500 mb-6">Your most recent proficiency levels.</p>
+                        <div style="position: relative; height: 220px; width: 100%;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-black text-gray-900 mb-1">Focus Areas</h2>
+                        <p class="text-xs text-gray-500 mb-6">Distribution of where you spend your reflection time.</p>
+                        <div style="position: relative; height: 220px; width: 100%;">
+                            <canvas id="doughnutChart"></canvas>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
         @endif
     </div>
 
-    <!-- The JavaScript -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             @if(!empty($chartData))
                 const rawData = {!! json_encode((object) $chartData) !!};
+                const themeColors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
+                const allSkills = {!! json_encode($skills->pluck('name')) !!};
+                const radar_data = allSkills.map(skillName => {
+                    if (rawData[skillName]) {
+                        const points = rawData[skillName];
+                        return parseFloat(points[points.length - 1].y);
+                    }
+                    return 0;
+                });
+
+
+                const radarCtx = document.getElementById('radarChart').getContext('2d');
+                new Chart(radarCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: allSkills,
+                        datasets: [{
+                            label: 'Current Level',
+                            data: radar_data,
+                            fill: true,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            pointBackgroundColor: 'rgb(255, 99, 132)',
+                            pointBorderColor: '#fff',
+                            borderDash: [3, 5],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: { min: 0, max: 5, ticks: { stepSize: 1, backdropColor: 'transparent' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                const doughnutLabels = Object.keys(rawData);
+                const doughnutData = doughnutLabels.map(skillName => rawData[skillName].length);
+
+                const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+                new Chart(doughnutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: doughnutLabels,
+                        datasets: [{
+                            data: doughnutData,
+                            backgroundColor: themeColors,
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { padding: 20, usePointStyle: true }
+                            }
+                        }
+                    }
+                });
                 const dropdown = document.getElementById('skillDropdown');
                 const chartWrapper = document.getElementById('chartWrapper');
                 const noDataWrapper = document.getElementById('noDataWrapper');
@@ -111,7 +200,6 @@
                 const debugText = document.getElementById('debugText');
                 let myChart = null;
 
-                // Handle "Same Day" reflections
                 for (const skill in rawData) {
                     if (rawData.hasOwnProperty(skill)) {
                         const dateCounts = {};
@@ -127,8 +215,6 @@
                     }
                 }
 
-                // THE FIX: AGGRESSIVE MATCHER
-                // Strips all spaces, hyphens, and weird characters so "Leadership " exactly matches "leadership"
                 function aggressiveMatch(str) {
                     return String(str).replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
                 }
@@ -137,52 +223,37 @@
                     const rawSelected = dropdown.value;
                     let selectedSkill = 'all';
 
-                    // Use the Aggressive Matcher
                     if (rawSelected !== 'all') {
                         selectedSkill = Object.keys(rawData).find(
                             key => aggressiveMatch(key) === aggressiveMatch(rawSelected)
                         );
                     }
 
-                    // Reset warnings
                     if (singlePointWarning) singlePointWarning.style.display = 'none';
 
-                    // NO DATA FALLBACK CHECK
                     if (rawSelected !== 'all' && !selectedSkill) {
                         chartWrapper.style.display = 'none';
                         noDataWrapper.style.display = 'flex';
-
-                        // Print Debug Info to the screen so you can see the glitch
-                        if (debugText) {
-                            debugText.innerText = `DEBUG -> You searched for: [${rawSelected}]. Database actually has: [${Object.keys(rawData).join(', ')}]`;
-                        }
-
+                        if (debugText) debugText.innerText = `DEBUG -> Searched: [${rawSelected}]. Has: [${Object.keys(rawData).join(', ')}]`;
                         if (myChart) myChart.destroy();
                         return;
                     }
 
-                    // Gamification Check (1 Reflection)
                     if (selectedSkill !== 'all' && rawData[selectedSkill] && rawData[selectedSkill].length === 1) {
                         if (singlePointWarning) singlePointWarning.style.display = 'block';
                     }
 
-                    // We have data! Show chart.
                     chartWrapper.style.display = 'block';
                     noDataWrapper.style.display = 'none';
 
-                    // Setup Dates (X-Axis)
                     let dates = new Set();
                     let skillsToCheck = selectedSkill === 'all' ? Object.keys(rawData) : [selectedSkill];
 
                     skillsToCheck.forEach(skill => {
-                        if (rawData[skill]) {
-                            rawData[skill].forEach(point => dates.add(point.x));
-                        }
+                        if (rawData[skill]) rawData[skill].forEach(point => dates.add(point.x));
                     });
                     let labels = Array.from(dates);
 
-                    // Setup Datasets (Lines)
-                    const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
                     let datasets = [];
                     let colorIndex = 0;
 
@@ -196,8 +267,8 @@
                             datasets.push({
                                 label: skill,
                                 data: dataPoints,
-                                borderColor: colors[colorIndex % colors.length],
-                                backgroundColor: colors[colorIndex % colors.length],
+                                borderColor: themeColors[colorIndex % themeColors.length],
+                                backgroundColor: themeColors[colorIndex % themeColors.length],
                                 tension: 0.3,
                                 borderWidth: 4,
                                 pointRadius: 8,
@@ -219,8 +290,7 @@
                             maintainAspectRatio: false,
                             scales: {
                                 y: {
-                                    min: 0,
-                                    max: 5.5,
+                                    min: 0, max: 5.5,
                                     title: { display: true, text: 'Proficiency Level (1-5)', font: { weight: 'bold' } },
                                     ticks: {
                                         stepSize: 1,
