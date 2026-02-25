@@ -13,7 +13,12 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $recentReflections = auth()->user()->reflections()
+                                        ->with('skillAssessments.skill')
+                                        ->latest()
+                                        ->take(4)
+                                        ->get();
+    return view('dashboard', compact('recentReflections'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
