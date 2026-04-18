@@ -47,7 +47,7 @@
                             <h3 class="text-lg font-bold text-gray-900 mb-1">No reflections yet</h3>
                             <p class="text-gray-500 text-sm mb-4">Start tracking your skill development by logging your
                                 first entry.</p>
-                            <a href="{{ route('reflections.create') }}"
+                            <a href="{{ route('reflection') }}"
                                 class="text-indigo-600 font-bold hover:text-indigo-800 transition">Log your first reflection
                                 &rarr;</a>
                         </div>

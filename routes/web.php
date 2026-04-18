@@ -53,5 +53,11 @@ Route::delete('/goal/{goal}', [GoalsController::class, 'deleteGoal'])->name('goa
 //Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
 Route::get('/analytics', [AnalyticsController::class, 'lineChart'])->name('analytics');
 
+Route::get('/verify-reflection/{id}', [ReflectionController::class, 'review'])->name('reflection.review')->middleware('signed');
+
+Route::post('/verify-reflection/{id}', [ReflectionController::class, 'approve'])->name('reflection.approve')->middleware('signed');
+
+Route::patch('/steps/{step}/toggle', [App\Http\Controllers\GoalsController::class, 'toggleStep'])->name('steps.toggle');
+
 
 require __DIR__.'/auth.php';

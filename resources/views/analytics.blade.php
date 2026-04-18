@@ -129,12 +129,12 @@
                     <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
                         class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                         <div id="noDataWrapper" style="display: none; height: 400px; width: 100%;"
-                            class="flex-col items-center justify-center text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                            <div class="text-5xl mb-3">🤷‍♂️</div>
+                            class="flex-col items-center justify-center text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 p-8">
+                            <div class="text-5xl mb-3">📊</div>
                             <p class="text-lg font-bold text-gray-700">No reflections logged for this skill yet.</p>
-                            <p class="text-sm">Once you add a reflection for this skill, your growth graph will appear here.
-                            </p>
-                            <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono"></p>
+                            <p class="text-sm text-gray-500">Once you add a reflection for this skill, your growth graph
+                                will appear here.</p>
+                            <p id="debugText" class="text-[10px] text-gray-400 mt-6 font-mono italic"></p>
                         </div>
                     </div>
                 </div>
@@ -169,30 +169,53 @@
                 const rawData = {!! json_encode((object) $chartData) !!};
                 const themeColors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
                 const allSkills = {!! json_encode($skills->pluck('name')) !!};
-                const radar_data = allSkills.map(skillName => {
-                    if (rawData[skillName]) {
-                        const points = rawData[skillName];
+
+                // --- 1. RADAR CHART ---
+                const radar_self_data = allSkills.map(skillName => {
+                    // Added safety net: (rawData[skillName]?.self || [])
+                    const points = rawData[skillName]?.self || [];
+                    if (points.length > 0) {
                         return parseFloat(points[points.length - 1].y);
                     }
                     return 0;
                 });
 
+                const radar_verifier_data = allSkills.map(skillName => {
+                    // Added safety net: (rawData[skillName]?.verifier || [])
+                    const points = rawData[skillName]?.verifier || [];
+                    if (points.length > 0) {
+                        const lastPoint = points[points.length - 1];
+                        return lastPoint && lastPoint.y !== null ? parseFloat(lastPoint.y) : 0;
+                    }
+                    return 0;
+                });
 
                 const radarCtx = document.getElementById('radarChart').getContext('2d');
                 new Chart(radarCtx, {
                     type: 'radar',
                     data: {
                         labels: allSkills,
-                        datasets: [{
-                            label: 'Current Level',
-                            data: radar_data,
-                            fill: true,
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgb(255, 99, 132)',
-                            pointBackgroundColor: 'rgb(255, 99, 132)',
-                            pointBorderColor: '#fff',
-                            borderDash: [3, 5],
-                        }]
+                        datasets: [
+                            {
+                                label: 'My Current Level',
+                                data: radar_self_data,
+                                fill: true,
+                                backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                                borderColor: 'rgb(79, 70, 229)',
+                                pointBackgroundColor: 'rgb(79, 70, 229)',
+                                pointBorderColor: '#fff',
+                            },
+                            {
+                                label: 'Supervisor Level',
+                                data: radar_verifier_data,
+                                fill: true,
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                borderColor: 'rgb(16, 185, 129)',
+                                pointBackgroundColor: 'rgb(16, 185, 129)',
+                                pointBorderColor: '#fff',
+                                borderDash: [5, 5],
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -200,11 +223,16 @@
                         scales: {
                             r: { min: 0, max: 5, ticks: { stepSize: 1, backdropColor: 'transparent' } }
                         },
-                        plugins: { legend: { display: false } }
+                        plugins: { legend: { display: true, position: 'bottom' } }
                     }
                 });
+
+                // --- 2. DOUGHNUT CHART ---
                 const doughnutLabels = Object.keys(rawData);
-                const doughnutData = doughnutLabels.map(skillName => rawData[skillName].length);
+                const doughnutData = doughnutLabels.map(skillName => {
+                    // Added safety net
+                    return (rawData[skillName]?.self || []).length;
+                });
 
                 const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
                 new Chart(doughnutCtx, {
@@ -231,6 +259,8 @@
                         }
                     }
                 });
+
+                // --- 3. LINE CHART ---
                 const dropdown = document.getElementById('skillDropdown');
                 const chartWrapper = document.getElementById('chartWrapper');
                 const noDataWrapper = document.getElementById('noDataWrapper');
@@ -238,14 +268,22 @@
                 const debugText = document.getElementById('debugText');
                 let myChart = null;
 
+                // Handle duplicate dates with safety nets
                 for (const skill in rawData) {
                     if (rawData.hasOwnProperty(skill)) {
                         const dateCounts = {};
-                        rawData[skill].forEach(point => {
+                        const selfData = rawData[skill]?.self || [];
+                        const verifierData = rawData[skill]?.verifier || [];
+
+                        selfData.forEach((point, index) => {
                             let originalDate = point.x;
                             if (dateCounts[originalDate]) {
                                 dateCounts[originalDate]++;
-                                point.x = `${originalDate} (Ref ${dateCounts[originalDate]})`;
+                                let newLabel = `${originalDate} (Ref ${dateCounts[originalDate]})`;
+                                point.x = newLabel;
+                                if (verifierData[index]) {
+                                    verifierData[index].x = newLabel;
+                                }
                             } else {
                                 dateCounts[originalDate] = 1;
                             }
@@ -258,7 +296,7 @@
                 }
 
                 function updateChart() {
-                    const rawSelected = dropdown.value;
+                    const rawSelected = dropdown ? dropdown.value : 'all';
                     let selectedSkill = 'all';
 
                     if (rawSelected !== 'all') {
@@ -267,55 +305,77 @@
                         );
                     }
 
+                    // Reset UI states
                     if (singlePointWarning) singlePointWarning.style.display = 'none';
-
-                    if (rawSelected !== 'all' && !selectedSkill) {
-                        chartWrapper.style.display = 'none';
-                        noDataWrapper.style.display = 'flex';
-                        if (debugText) debugText.innerText = `DEBUG -> Searched: [${rawSelected}]. Has: [${Object.keys(rawData).join(', ')}]`;
-                        if (myChart) myChart.destroy();
-                        return;
-                    }
-
-                    if (selectedSkill !== 'all' && rawData[selectedSkill] && rawData[selectedSkill].length === 1) {
-                        if (singlePointWarning) singlePointWarning.style.display = 'block';
-                    }
-
                     chartWrapper.style.display = 'block';
                     noDataWrapper.style.display = 'none';
 
-                    let dates = new Set();
-                    let skillsToCheck = selectedSkill === 'all' ? Object.keys(rawData) : [selectedSkill];
+                    // 1. Collect ALL unique dates from the selected data
+                    let datesSet = new Set();
+                    let skillsToCheck = (selectedSkill === 'all') ? Object.keys(rawData) : [selectedSkill];
 
                     skillsToCheck.forEach(skill => {
-                        if (rawData[skill]) rawData[skill].forEach(point => dates.add(point.x));
+                        if (rawData[skill]) {
+                            (rawData[skill].self || []).forEach(p => datesSet.add(p.x));
+                            (rawData[skill].verifier || []).forEach(p => datesSet.add(p.x));
+                        }
                     });
-                    let labels = Array.from(dates);
 
+                    // Sort labels chronologically (Optional, but looks better)
+                    let labels = Array.from(datesSet);
+
+                    // 2. Build Datasets
                     let datasets = [];
                     let colorIndex = 0;
 
                     skillsToCheck.forEach(skill => {
                         if (rawData[skill]) {
-                            let dataPoints = labels.map(label => {
-                                let foundPoint = rawData[skill].find(p => p.x == label);
-                                return foundPoint ? parseFloat(foundPoint.y) : null;
+                            let selfColor = themeColors[colorIndex % themeColors.length];
+
+                            // MAP SELF SCORES: Look for a match for every label
+                            let selfDataPoints = labels.map(label => {
+                                let match = rawData[skill].self.find(p => String(p.x) === String(label));
+                                return match ? parseFloat(match.y) : null;
                             });
 
                             datasets.push({
-                                label: skill,
-                                data: dataPoints,
-                                borderColor: themeColors[colorIndex % themeColors.length],
-                                backgroundColor: themeColors[colorIndex % themeColors.length],
+                                label: selectedSkill === 'all' ? `${skill} (Self)` : 'My Self Score',
+                                data: selfDataPoints,
+                                borderColor: selfColor,
+                                backgroundColor: selfColor,
                                 tension: 0.3,
                                 borderWidth: 4,
-                                pointRadius: 8,
-                                pointHoverRadius: 12,
+                                pointRadius: 6,
+                                spanGaps: true // This connects the dots even if there are nulls in between
+                            });
+
+                            // MAP VERIFIER SCORES
+                            let verifierDataPoints = labels.map(label => {
+                                let match = (rawData[skill].verifier || []).find(p => String(p.x) === String(label));
+                                return (match && match.y !== null) ? parseFloat(match.y) : null;
+                            });
+
+                            let verifierColor = selectedSkill === 'all' ? selfColor : '#10B981';
+
+                            datasets.push({
+                                label: selectedSkill === 'all' ? `${skill} (Supervisor)` : 'Supervisor Score',
+                                data: verifierDataPoints,
+                                borderColor: verifierColor,
+                                backgroundColor: verifierColor,
+                                borderDash: [8, 5],
+                                tension: 0.3,
+                                borderWidth: 4,
+                                pointRadius: 6,
                                 spanGaps: true
                             });
+
                             colorIndex++;
                         }
                     });
+
+                    // 3. DEBUG: Check if we actually have numbers now
+                    console.log("Labels generated:", labels);
+                    console.log("Datasets generated:", datasets);
 
                     if (myChart) myChart.destroy();
 
@@ -326,21 +386,14 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: { mode: 'index', intersect: false }
+                            },
                             scales: {
                                 y: {
                                     min: 0, max: 5.5,
-                                    title: { display: true, text: 'Proficiency Level (1-5)', font: { weight: 'bold' } },
-                                    ticks: {
-                                        stepSize: 1,
-                                        callback: function (value) {
-                                            if (value === 1) return '1 (Starter)';
-                                            if (value === 3) return '3 (Intermediate)';
-                                            if (value === 5) return '5 (Expert)';
-                                            return value;
-                                        }
-                                    }
-                                },
-                                x: { title: { display: true, text: 'Date', font: { weight: 'bold' } } }
+                                    ticks: { stepSize: 1 }
+                                }
                             }
                         }
                     });
@@ -348,8 +401,9 @@
 
                 if (dropdown) {
                     dropdown.addEventListener('change', updateChart);
-                    updateChart();
                 }
+                updateChart();
+
             @endif
         });
     </script>

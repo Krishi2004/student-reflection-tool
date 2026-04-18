@@ -82,24 +82,40 @@
                             placeholder="Context...">{{ old('situation') }}</textarea>
                         @error('situation') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
 
-                        <div id="error-situation" style="display: none;" class="text-red-500 text-sm font-bold mt-2 items-center">
+                        <div id="error-situation" style="display: none;"
+                            class="text-red-500 text-sm font-bold mt-2 items-center">
                             <span class="mr-2">⚠️</span> <span class="error-text"></span>
                         </div>
                     </div>
-                    
 
                     <div>
-                        <label class="block text-sm font-bold text-indigo-700">Action (You)</label>
+                        <label class="block text-sm font-bold text-gray-700">Task</label>
+                        <textarea id='taskInput' name="task" rows="2" required
+                            class="w-full rounded border-gray-300 gibberish-check"
+                            placeholder="What was the task?">{{ old('task') }}</textarea>
+                        @error('task') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+
+                        <div id="error-situation" style="display: none;"
+                            class="text-red-500 text-sm font-bold mt-2 items-center">
+                            <span class="mr-2">⚠️</span> <span class="error-text"></span>
+                        </div>
+                    </div>
+
+
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Action (You)</label>
                         <textarea id='actionInput' name="action" rows="3" required
-                            class="w-full rounded border-indigo-200 bg-indigo-50 gibberish-check"
+                            class="w-full rounded border-gray-300 gibberish-check"
                             placeholder="Your specific actions...">{{ old('action') }}</textarea>
                         @error('action') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
 
-                        <div id="error-action" style="display: none;" class="text-red-500 text-sm font-bold mt-2 items-center">
+                        <div id="error-action" style="display: none;"
+                            class="text-red-500 text-sm font-bold mt-2 items-center">
                             <span class="mr-2">⚠️</span> <span class="error-text"></span>
                         </div>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Result</label>
                         <textarea id='resultInput' name="result" rows="2" required
@@ -107,18 +123,20 @@
                             placeholder="Outcome...">{{ old('result') }}</textarea>
                         @error('result') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
 
-                        <div id="error-result" style="display: none;" class="text-red-500 text-sm font-bold mt-2 items-center">
+                        <div id="error-result" style="display: none;"
+                            class="text-red-500 text-sm font-bold mt-2 items-center">
                             <span class="mr-2">⚠️</span> <span class="error-text"></span>
                         </div>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Analysis (What did you learn?)</label>
                         <textarea id="analysisInput" name="analysis" rows="2" required
                             class="w-full rounded border-gray-300 gibberish-check"
                             placeholder="If you did this again, what would you do differently?">{{ old('analysis') }}</textarea>
                         @error('analysis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                        <div id="error-analysis" style="display: none;" class="text-red-500 text-sm font-bold mt-2 items-center">
+                        <div id="error-analysis" style="display: none;"
+                            class="text-red-500 text-sm font-bold mt-2 items-center">
                             <span class="mr-2">⚠️</span> <span class="error-text"></span>
                         </div>
                     </div>
@@ -166,14 +184,14 @@
                         <button type="submit"
                             class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
                     </div>
+
             </form>
         </div>
 
     </div>
-    
+
     <div class="mt-8">
         <h3 class="text-xl font-bold text-gray-800 mb-4">Past Entries</h3>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($reflections as $reflection)
                 <div
@@ -207,11 +225,25 @@
                             @endfor
                         </div>
                     </div>
+                    <div class="mt-2">
+                        <span
+                            class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            Quality Score: {{ number_format($reflection->r_quality_score, 1) }} / 5.0
+                        </span>
+                    </div>
 
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                         <div class="text-sm text-gray-600">
                         </div>
-                        <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
+                        <span class="text-xs text-orange-500 font-semibold">
+                            @if ($reflection->verified_at)
+                                <span class="text-xs text-green-600 font-bold">✅ Verified On
+                                    {{ \Carbon\Carbon::parse($reflection->verified_at)->format('d M Y') }}</span>
+                            @else
+                                <span class="text-xs text-orange-500 font-semibold">Pending Verification</span>
+
+                            @endif
+                        </span>
                     </div>
                     <div class="flex gap-2">
 
@@ -307,7 +339,7 @@
             const textareas = document.querySelectorAll('.gibberish-check');
 
             function isGibberish(text) {
-                if (text.trim().length === 0) return null; 
+                if (text.trim().length === 0) return null;
                 if (text.trim().length < 15) return "Response is too short. Please elaborate!";
                 if (!/^[a-zA-Z0-9\s.,!?'"()\-]+$/.test(text)) return "Please use standard English characters only.";
                 if (!/[aeiouy]/i.test(text)) return "Please use real words (missing vowels detected).";
@@ -325,7 +357,7 @@
                     textareas.forEach(textarea => {
                         const errorMessage = isGibberish(textarea.value);
                         const errorContainer = document.getElementById('error-' + textarea.name);
-                        
+
                         if (errorContainer) {
                             const errorText = errorContainer.querySelector('.error-text');
 
@@ -348,7 +380,7 @@
 
                 textareas.forEach(textarea => {
                     const errorContainer = document.getElementById('error-' + textarea.name);
-                    
+
                     if (errorContainer) {
                         const errorText = errorContainer.querySelector('.error-text');
 
@@ -368,10 +400,11 @@
                     }
                 });
             }
+
         });
 
         function LevelUp(skillId) {
-            if(skillId) {
+            if (skillId) {
                 $('#skill_id_select').val(skillId);
             }
             $('.center').fadeIn();
@@ -380,4 +413,5 @@
         }
     </script>
 </body>
+
 </html>

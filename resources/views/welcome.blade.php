@@ -44,9 +44,9 @@
 
         
         
-        <!-- RIGHT COLUMN: Picture/Illustration -->
+        
     <div class="lg:col-span-1 flex items-center justify-right p-6 bg-gray-800 rounded-xl shadow-2xl min-h-[300px]">
-       <p style="text-align:center;">Picture</p>
+       <img src="{{ asset('storage/analytics.png') }}" alt="Analytics Page">
     </div>
 </div>
 
@@ -72,8 +72,8 @@
         </div>
         <div class="border border-indigo-600 rounded-md p-8 text-2xl col-span-2 mx-auto max-w-xl">
             <div>
-                <span class="text-xl font-bold block">Bias Reduction & Validation</span>
-                <span class="text-xl block mt-2">Eliminate self-assessment bias. Get external, high-confidence validation on your scores from supervisors or peers.</span>
+                <span class="text-xl font-bold block">Targeted Advising</span>
+                <span class="text-xl block mt-2">Turn analytics into action. Receive personalised, automated advice and actionable steps tailored exactly to your verified skill gaps and target goals</span>
             </div>
         </div>
         
@@ -138,7 +138,7 @@
                                 
                         </a>
                     </div>
-                    <span class="text-lg text-gray-500 text-center block">©<a href="https://pagedone.io/">Level Up</a> 2024, All rights reserved.</span>
+                    <span class="text-lg text-gray-500 text-center block">©<a href="https://pagedone.io/">Level Up</a> 2026, All rights reserved.</span>
             </div>
         </div>
     </footer>

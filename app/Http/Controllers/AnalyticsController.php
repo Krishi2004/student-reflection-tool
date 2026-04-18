@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use \Illuminate\Support\Facades\DB;
 use App\Models\Goal;
 use App\Models\Reflection;
 use Illuminate\Http\Request;
@@ -13,48 +14,54 @@ class AnalyticsController extends Controller
 {
     public function index()
     {
-        $userId = auth()->id();
+        $userId = auth()->id(); // gets the ID of the user currently logged in
         $stats = [
-            'total_goals' => Goal::where('user_id', $userId)->count(),
-            'completed_goals' => Goal::where('user_id', $userId)->where('status', 'Completed')->count(),
-            'avg_target_score' => Goal::where('user_id', $userId)->avg('target_score'),
-            'total_reflection' => Reflection::where('user_id', $userId)->count(),
+            'total_goals' => Goal::where('user_id', $userId)->count(), // counts all the goals with the $userID
+            'completed_goals' => Goal::where('user_id', $userId)->where('status', 'Completed')->count(), // counts all the goals that are completed
+            'avg_target_score' => Goal::where('user_id', $userId)->avg('target_score'), // Calcualtes the avg target score all of the goals
+            'total_reflection' => Reflection::where('user_id', $userId)->count(), // counts all the reflections with the $userID
         ];
-        return view('analytics', compact('stats'));
+        return view('analytics', compact('stats')); // sends the above to the analytic page
     }
 
     public function linechart()
     {
-        // 1. Get standard data
-        $skills = Skill::all();
-        $reflections = Reflection::where('user_id', auth()->id())
+ 
+        $skills = Skill::all(); // gets all the skills available from the DB
+        $reflections = Reflection::where('user_id', auth()->id()) // Gets all the reflection from the user 
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // 2. Build the Chart Data
+
         $chartData = [];
-        foreach ($reflections as $reflection) {
-            $assessment = \Illuminate\Support\Facades\DB::table('skill_assessments')
-                ->where('reflection_id', $reflection->id)
-                ->first() ?? \Illuminate\Support\Facades\DB::table('skill_assessment')
-                ->where('reflection_id', $reflection->id)
+        foreach ($reflections as $reflection) { // loops through each reflection
+            $assessment = DB::table('skill_assessments')
+                ->where('reflection_id', $reflection->id) // looks for the scores that tie with the reflection
                 ->first();
 
             if ($assessment) {
                 $skill = Skill::find($assessment->skill_id);
                 if ($skill) {
-                    $chartData[$skill->name][] = [
-                        'x' => \Carbon\Carbon::parse($reflection->created_at)->format('M d'),
+
+                // Self Score
+                    $chartData[$skill->name]['self'][] = [
+                        'x' => \Carbon\Carbon::parse($reflection->created_at)->format('M d'), // Carbon converts timestamps to readable text
                         'y' => (float) $assessment->self_score
+                    ];
+
+                //Supervisor Score
+                    $chartData[$skill->name]['verifier'][] = [
+                        'x' => \Carbon\Carbon::parse($reflection->created_at)->format('M d'),
+                        'y' =>(float) $assessment->verifier_score
                     ];
                 }
             }
         }
 
-        // 3. Delegate the heavy math to our new custom helper method!
-        $stats = $this->calculateExecutiveStats($chartData, $reflections->count());
 
-        // 4. Send it to the view
+        $stats = $this->calculateExecutiveStats($chartData, $reflections->count()); // Calculates the Top Skill and most practiced
+
+
         return view('analytics', [
             'chartData'          => $chartData,
             'skills'             => $skills,
@@ -64,9 +71,7 @@ class AnalyticsController extends Controller
         ]);
     }
 
-    /**
-     * Helper Method: Calculates stats for the Executive Summary Cards
-     */
+ 
     private function calculateExecutiveStats($chartData, $totalReflections)
     {
         $skillCounts = [];
@@ -78,25 +83,25 @@ class AnalyticsController extends Controller
             
             // Get all scores for this skill and find the average
             $scores = array_column($dataPoints, 'y');
-            $skillAverages[$skillName] = array_sum($scores) / count($scores);
+            $skillAverages[$skillName] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
         }
 
-        // Math for "Most Practiced Skill"
+        // Most Practiced Skill count
         $mostPracticedSkill = 'No data yet';
         if (!empty($skillCounts)) {
-            arsort($skillCounts); // Sorts highest to lowest
-            $mostPracticedSkill = array_key_first($skillCounts); // Grabs the top one
+            arsort($skillCounts); 
+            $mostPracticedSkill = array_key_first($skillCounts); 
         }
 
-        // Math for "Top Skill"
+        // Top Skill count 
         $topSkill = 'No data yet';
         if (!empty($skillAverages)) {
-            arsort($skillAverages); // Sorts highest to lowest
+            arsort($skillAverages); 
             $topSkillName = array_key_first($skillAverages);
             $topSkill = $topSkillName . ' (' . number_format($skillAverages[$topSkillName], 1) . '/5)';
         }
 
-        // Return a clean array back to the main analytics method
+
         return [
             'totalReflections'   => $totalReflections,
             'mostPracticedSkill' => $mostPracticedSkill,
