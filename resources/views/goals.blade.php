@@ -86,14 +86,25 @@
                         <input value="" type="date" name="deadline" required class="w-full rounded border-gray-300">
                     </div>
                 </div>
-                <div class="space-y-3 mb-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">How (Action Plan/ Description)</label>
-                        <textarea value="{{ old('analysis') }}" name="description" rows="2" required
-                            class="w-full rounded border-gray-300"
-                            placeholder="I will practice in front of a mirror twice a week and join a debate club">{{ old('analysis') }}</textarea>
-                        @error('analysis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <div>
+                    <h3 class="block text-sm font-medium text-gray-700">Break it down</h3>
+                    <p class="text-sm text-gray-500 mb-4">Add smaller, manageable steps to help you reach this goal.</p>
+
+                    <div id="steps-container">
+                        <div class="flex gap-2 mb-3 step-row">
+                            <input type="text" name="steps[]" placeholder="e.g. Practice in front of a mirror"
+                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required>
+                        </div>
                     </div>
+                    <button type="button" id="add-step-btn"
+                        class="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center">
+                        + Add another step
+                    </button>
+                </div>
+                <div><br>
+                    <label class="block text-sm font-medium text-gray-700">Notes</label>
+                    <input value="" type="text" name="description" class="w-full rounded border-gray-300">
                 </div>
 
 
@@ -101,7 +112,7 @@
                 <div class="flex justify-end space-x-3 pt-4 border-t">
 
                     <button type="button"
-                        class=" close-modal-btnpx-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
+                        class="close-modal-btn px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
                     <button type="submit"
                         class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
                 </div>
@@ -139,6 +150,22 @@
                             </div>
                             <span class="text-xs text-orange-500 font-semibold">{{ $goal->status }}</span>
                         </div>
+                        @foreach($goal->actionSteps as $step)
+                            <div class="flex items-center gap-2 mt-2">
+                                <form action="{{ route('steps.toggle', $step->id) }}" method="POST" class="m-0 p-0">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <input type="checkbox" onChange="this.form.submit()"
+                                        class="w-5 h-5 text-indigo-600 rounded cursor-pointer" {{ $step->is_completed ? 'checked' : '' }}>
+                                </form>
+
+                                <span
+                                    class="text-sm {{ $step->is_completed ? 'line-through text-gray-400' : 'text-gray-700' }}">
+                                    {{ $step->description }}
+                                </span>
+                            </div><br>
+                        @endforeach
                         <div class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">
                             <button onclick="openViewModal({{ $goal->id }})"
                                 class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">
@@ -163,8 +190,7 @@
                 <div style="overflow: auto; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                     <h2 id="view-title" class="float-left text-xl font-bold text-gray-900">{{ old('title', $goal->title) }}
                     </h2>
-                    <button id="closeView" style="float: right;"
-                        class="text-gray-500 hover:text-red-500 font-bold">X</button>
+                    <button onclick="$('#viewModal-{{ $goal->id }}').fadeOut(); $('#show').fadeIn();" style="float: right;" class="text-gray-500 hover:text-red-500 font-bold">X</button>
                 </div>
 
                 <div class="mb-4">
@@ -174,13 +200,24 @@
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Action
-                        Plan</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Action Plan</label>
+                    @if($goal->actionSteps->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($goal->actionSteps as $step)
+                                <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div class="flex-1">
+                                        <p
+                                            class="text-sm {{ $step->is_completed ? 'text-gray-400 line-through' : 'text-gray-700' }}">
+                                            {{ $step->description }}
+                                        </p>
+                                    </div>
 
-                    <div id="view-desc" class="text-gray-700 bg-gray-50 p-4 rounded border border-gray-200 leading-relaxed">
-                        <span id="view-description"
-                            class="text-lg font-bold text-gray-900">{{ old('description', $goal->description) }}</span>
-                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-500 italic">No action steps set for this goal.</p>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
@@ -270,6 +307,39 @@
             $('#viewModal-' + id).fadeIn();
             $('#show').hide();
         }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('steps-container');
+            const addButton = document.getElementById('add-step-btn');
+
+            // When the user clicks "Add another step"
+            addButton.addEventListener('click', function () {
+                // Create a new div to hold the input
+                const newRow = document.createElement('div');
+                newRow.className = 'flex gap-2 mb-3 step-row';
+
+                // Put the input box inside the div (plus a little 'X' to delete it)
+                newRow.innerHTML = `
+            <input type="text" name="steps[]" placeholder="Next step..."
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                <button type="button" class="remove-step-btn px-3 py-2 text-red-500 hover:text-red-700 font-bold" title="Remove this step">
+                    ✕
+                </button>
+            `;
+
+                // Add it to the screen
+                container.appendChild(newRow);
+            });
+
+            // Event listener for the 'X' remove buttons (using Event Delegation)
+            container.addEventListener('click', function (e) {
+                if (e.target.classList.contains('remove-step-btn')) {
+                    // Find the parent row of the clicked 'X' and delete it
+                    e.target.closest('.step-row').remove();
+                }
+            });
+        });
     </script>
 
 
