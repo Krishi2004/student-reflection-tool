@@ -10,7 +10,7 @@ class Reflection extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+    protected $fillable = [ // All the columns in the Relfection table
         'user_id',
         'title',
         'narrative',
@@ -19,19 +19,19 @@ class Reflection extends Model
         'template_used',
     ];
 
-    protected $casts = [
+    protected $casts = [ // converts the JSON text to a PHP array
         'narrative' => 'array',
         'verified_at' => 'datetime',
     ];
 
-    // Relationship to User
-    public function student()
+
+    public function student() // links the relfection to the student who created it
     {
         return $this->belongsTo(User::class, 'student_id');
     }
 
     // Relationship to Assessments
-    public function skillAssessments()
+    public function skillAssessments() // one to many relationship
     {
         return $this->hasMany(SkillAssessment::class);
     }

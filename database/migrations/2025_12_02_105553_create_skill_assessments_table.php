@@ -6,13 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('skill_assessments', function (Blueprint $table) {
-            $table->id();
+        $table->id();
         $table->foreignId('reflection_id')->constrained('reflections')->onDelete('cascade');
         $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
         $table->decimal('self_score', 3, 2); 

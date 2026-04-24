@@ -12,10 +12,10 @@ use App\Models\Goal;
 
 class GoalsController extends Controller
 {
-    public function create()
+    public function index() // Selects all the goals related to the logged in user
     {
 
-        $skills = Skill::all();
+        $skills = Skill::all(); // pulls all the skills for the dropdown
 
 
 
@@ -23,19 +23,19 @@ class GoalsController extends Controller
             ->with([
                 'skill',
                 'actionSteps' => function ($query) {
-                    $query->orderBy('sequence_order', 'asc');
+                    $query->orderBy('sequence_order', 'asc'); // gets the action steps in the sequence order
                 }
             ])
             ->orderBy('deadline', 'asc')
-            ->get();
+            ->get(); // selects all the goals that belong to the logged in user and displays their goals and action steps
 
 
-        return view('goals', compact('skills', 'goals'));
+        return view('goals', compact('skills', 'goals')); // packages the skills and goals to be viewed in the goals page
     }
 
-    public function store(Request $request)
+    public function store(Request $request) // used to save a new goals and its action steps
     {
-        // 1. VALIDATION
+        
         $request->validate([
             'title' => 'required|string|max:255',
             'skill_id' => 'required|exists:skills,id',
@@ -43,12 +43,12 @@ class GoalsController extends Controller
             'deadline' => 'nullable|date',
             'description' => 'nullable|string',
             'steps' => 'nullable|array',
-            'steps.*' => 'required_with:steps|string|max:255',
+            'steps.*' => 'required_with:steps|string|max:255', //apply this to every item in the action_steps array
 
         ]);
 
 
-        $goal = Goal::create([
+        $goal = Goal::create([ // creating a new goal record
             'user_id' => Auth::id(),
             'skill_id' => $request->skill_id,
             'target_score' => $request->target_score,
@@ -58,11 +58,11 @@ class GoalsController extends Controller
             'description' => $request->description,
         ]);
 
-        if ($request->filled('steps')) {
+        if ($request->filled('steps')) { // checks if the goal record has action steps
             $sequence = 1;
             foreach ($request->steps as $stepdescription) {
                 if (trim($stepdescription) !== '') {
-                    $goal->actionSteps()->create([
+                    $goal->actionSteps()->create([ // create a record in the action steps table
                         'description' => $stepdescription,
                         'sequence_order' => $sequence,
                     ]);
@@ -72,13 +72,13 @@ class GoalsController extends Controller
         }
 
 
-        return redirect()->route('goals')->with('success', 'Goal submitted successfully!');
+        return redirect()->route('goals');
     }
 
-    public function update(Request $request, Goal $goal)
+    public function update(Request $request, Goal $goal) // allows a user to edit their existing goals
     {
 
-        $goal->update([
+        $goal->update([ // updates the record with the new data
             'title' => $request->title,
             'description' => $request->description,
             'deadline' => $request->deadline,
@@ -87,7 +87,7 @@ class GoalsController extends Controller
         ]);
         $goal->actionSteps()->delete();
 
-        // Then, recreate them based on whatever is currently in the form
+        
         if ($request->filled('steps')) {
             $sequence = 1;
             foreach ($request->steps as $stepDescription) {
@@ -101,10 +101,10 @@ class GoalsController extends Controller
             }
         }
 
-        return redirect()->route('goals')->with('success');
+        return redirect()->route('goals');
     }
 
-    public function edit(Goal $goal)
+    public function editView(Goal $goal) // allows the user to click on edit which takes them to the goals edit page
     {
 
         $skills = Skill::all();
@@ -112,41 +112,41 @@ class GoalsController extends Controller
         return view('goals_edit', compact('skills', 'goal'));
     }
 
-    public function deleteGoal(Goal $goal)
+    public function deleteGoal(Goal $goal) // function to allow the user to delete their goals
     {
-        if (auth()->id() !== $goal->user_id) {
+        if (auth()->id() !== $goal->user_id) { // checks if the logged in user matches the goals owner id
             abort(403, 'unauthorised action');
 
         }
-        $goal->delete();
-        return redirect()->route('goals')->with('success', 'Goal deleted');
+        $goal->delete(); // deletes the selected goal
+        return redirect()->route('goals');
     }
 
-    public function toggleStep(ActionStep $step)
+    public function toggleStep(ActionStep $step) // Allows the user to tick off their steps 
     {
-        // 1. Security: Make sure they own the goal this step belongs to!
-        if (auth()->id() !== $step->goal->user_id) {
+        
+        if (auth()->id() !== $step->goal->user_id) { // checks if the logged in user matches the action steps owner
             abort(403, 'unauthorised action');
         }
 
-        // 2. Flip the status
-        $step->update([
-            'is_completed' => !$step->is_completed
+        
+        $step->update([ 
+            'is_completed' => !$step->is_completed // whatever the status was it flips
         ]);
 
         $goal = $step->goal;
         $completedsteps = $goal->actionSteps()->where('is_completed', true)->count();
-        $totalsteps = $goal->actionsteps()->count();
+        $totalsteps = $goal->actionSteps()->count();
 
-        if ($totalsteps > 0 && $totalsteps === $completedsteps) {
+        if ($totalsteps > 0 && $totalsteps === $completedsteps) { // if all the steps are completed mark status as completed
             $goal->update(['status' => 'Completed']);
 
-        }elseif ($goal->status === 'Completed' && $completedsteps < $totalsteps) {
+        }elseif ($goal->status === 'Completed' && $completedsteps < $totalsteps) { // if not keep it as in progress
             $goal->update(['status' => 'In Progress']);
 
         }
 
-        // 3. Send them right back where they were
+        
         return back();
     }
 }

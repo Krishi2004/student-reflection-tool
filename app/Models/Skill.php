@@ -9,20 +9,20 @@ class Skill extends Model
 {
     use HasFactory;
 
-    // This allows mass-assignment for these columns
-    protected $fillable = [
+    
+    protected $fillable = [ // columns for the skill table
         'name',
         'description',
     ];
 
-    // Define relationship: A Skill has many Assessments
-    public function assessments()
+    
+    public function assessments() // links a skill to every time a student has scored on it
     {
         return $this->hasMany(SkillAssessment::class);
     }
     
-    // Define relationship: A Skill has many Goals
-    public function goals()
+    
+    public function goals() // links a skill to the students objectives
     {
         return $this->hasMany(Goal::class);
     }

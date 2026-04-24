@@ -166,22 +166,22 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             @if(!empty($chartData))
-                const rawData = {!! json_encode((object) $chartData) !!};
+
+
+                const rawData = {!! json_encode((object) $chartData) !!}; // converts PHP data into JS
                 const themeColors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
                 const allSkills = {!! json_encode($skills->pluck('name')) !!};
 
-                // --- 1. RADAR CHART ---
-                const radar_self_data = allSkills.map(skillName => {
-                    // Added safety net: (rawData[skillName]?.self || [])
-                    const points = rawData[skillName]?.self || [];
+
+                const radar_self_data = allSkills.map(skillName => { // loops through every skill and selects the most recent score
+                    const points = rawData[skillName]?.self || []; // look for the specifc skill if not default to an empty list
                     if (points.length > 0) {
-                        return parseFloat(points[points.length - 1].y);
+                        return parseFloat(points[points.length - 1].y); // converts to decimal instead of text to plot on the chart
                     }
                     return 0;
                 });
 
-                const radar_verifier_data = allSkills.map(skillName => {
-                    // Added safety net: (rawData[skillName]?.verifier || [])
+                const radar_verifier_data = allSkills.map(skillName => { // same function as above but for the verifier score
                     const points = rawData[skillName]?.verifier || [];
                     if (points.length > 0) {
                         const lastPoint = points[points.length - 1];
@@ -190,8 +190,8 @@
                     return 0;
                 });
 
-                const radarCtx = document.getElementById('radarChart').getContext('2d');
-                new Chart(radarCtx, {
+                const radarCtx = document.getElementById('radarChart').getContext('2d'); // renders the radar chart
+                new Chart(radarCtx, { // this creates the chart object
                     type: 'radar',
                     data: {
                         labels: allSkills,
@@ -227,15 +227,13 @@
                     }
                 });
 
-                // --- 2. DOUGHNUT CHART ---
-                const doughnutLabels = Object.keys(rawData);
-                const doughnutData = doughnutLabels.map(skillName => {
-                    // Added safety net
+                const doughnutLabels = Object.keys(rawData); // Selects the skills as the labels
+                const doughnutData = doughnutLabels.map(skillName => { //loops through all the skill names and returns the total number for that skill
                     return (rawData[skillName]?.self || []).length;
                 });
 
-                const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-                new Chart(doughnutCtx, {
+                const doughnutCtx = document.getElementById('doughnutChart').getContext('2d'); // renders the doughnut chart
+                new Chart(doughnutCtx, { // creates the chart object
                     type: 'doughnut',
                     data: {
                         labels: doughnutLabels,
@@ -260,18 +258,15 @@
                     }
                 });
 
-                // --- 3. LINE CHART ---
                 const dropdown = document.getElementById('skillDropdown');
                 const chartWrapper = document.getElementById('chartWrapper');
                 const noDataWrapper = document.getElementById('noDataWrapper');
-                const singlePointWarning = document.getElementById('singlePointWarning');
-                const debugText = document.getElementById('debugText');
+                const singlePointWarning = document.getElementById('singlePointWarning'); // need atleast to points to draw a line
                 let myChart = null;
 
-                // Handle duplicate dates with safety nets
-                for (const skill in rawData) {
+                for (const skill in rawData) { // if a student logs 2 reflection on the same day this would nornmally be overlapped so this renames it
                     if (rawData.hasOwnProperty(skill)) {
-                        const dateCounts = {};
+                        const dateCounts = {}; // creates a count of the current skill
                         const selfData = rawData[skill]?.self || [];
                         const verifierData = rawData[skill]?.verifier || [];
 
@@ -279,7 +274,7 @@
                             let originalDate = point.x;
                             if (dateCounts[originalDate]) {
                                 dateCounts[originalDate]++;
-                                let newLabel = `${originalDate} (Ref ${dateCounts[originalDate]})`;
+                                let newLabel = `${originalDate} (Ref ${dateCounts[originalDate]})`; // creates a new label if 2 reflections are created on the same date
                                 point.x = newLabel;
                                 if (verifierData[index]) {
                                     verifierData[index].x = newLabel;
@@ -291,40 +286,33 @@
                     }
                 }
 
-                function aggressiveMatch(str) {
-                    return String(str).replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-                }
 
-                function updateChart() {
-                    const rawSelected = dropdown ? dropdown.value : 'all';
+
+                function updateChart() { // function to update the chart when a user selects a skill from the dropdown
+                    const rawSelected = dropdown ? dropdown.value : 'all'; // checks what the user click on in the dropdown
                     let selectedSkill = 'all';
-
                     if (rawSelected !== 'all') {
                         selectedSkill = Object.keys(rawData).find(
-                            key => aggressiveMatch(key) === aggressiveMatch(rawSelected)
+                            key => key === rawSelected
                         );
                     }
 
-                    // Reset UI states
-                    if (singlePointWarning) singlePointWarning.style.display = 'none';
+                    if (singlePointWarning) singlePointWarning.style.display = 'none'; // if no data is available show that user needs to log a reflection
                     chartWrapper.style.display = 'block';
                     noDataWrapper.style.display = 'none';
 
-                    // 1. Collect ALL unique dates from the selected data
-                    let datesSet = new Set();
+                    let datesSet = new Set(); // used to remove duplicate dates
                     let skillsToCheck = (selectedSkill === 'all') ? Object.keys(rawData) : [selectedSkill];
 
-                    skillsToCheck.forEach(skill => {
+                    skillsToCheck.forEach(skill => { // goes through every reflection and stores the date
                         if (rawData[skill]) {
                             (rawData[skill].self || []).forEach(p => datesSet.add(p.x));
                             (rawData[skill].verifier || []).forEach(p => datesSet.add(p.x));
                         }
                     });
 
-                    // Sort labels chronologically (Optional, but looks better)
-                    let labels = Array.from(datesSet);
 
-                    // 2. Build Datasets
+                    let labels = Array.from(datesSet); // Label for the line chart
                     let datasets = [];
                     let colorIndex = 0;
 
@@ -332,10 +320,9 @@
                         if (rawData[skill]) {
                             let selfColor = themeColors[colorIndex % themeColors.length];
 
-                            // MAP SELF SCORES: Look for a match for every label
-                            let selfDataPoints = labels.map(label => {
+                            let selfDataPoints = labels.map(label => { // for every date on the timeline it looks to see if there is a score
                                 let match = rawData[skill].self.find(p => String(p.x) === String(label));
-                                return match ? parseFloat(match.y) : null;
+                                return match ? parseFloat(match.y) : null; // returns a decimal if there is a value
                             });
 
                             datasets.push({
@@ -346,16 +333,16 @@
                                 tension: 0.3,
                                 borderWidth: 4,
                                 pointRadius: 6,
-                                spanGaps: true // This connects the dots even if there are nulls in between
+                                spanGaps: true
                             });
 
-                            // MAP VERIFIER SCORES
-                            let verifierDataPoints = labels.map(label => {
+
+                            let verifierDataPoints = labels.map(label => { // does the same as the Self score line 
                                 let match = (rawData[skill].verifier || []).find(p => String(p.x) === String(label));
                                 return (match && match.y !== null) ? parseFloat(match.y) : null;
                             });
 
-                            let verifierColor = selectedSkill === 'all' ? selfColor : '#10B981';
+                            let verifierColor = selectedSkill === 'all' ? selfColor : '#10B981'; // the verifier score is using a different colour
 
                             datasets.push({
                                 label: selectedSkill === 'all' ? `${skill} (Supervisor)` : 'Supervisor Score',
@@ -373,11 +360,7 @@
                         }
                     });
 
-                    // 3. DEBUG: Check if we actually have numbers now
-                    console.log("Labels generated:", labels);
-                    console.log("Datasets generated:", datasets);
-
-                    if (myChart) myChart.destroy();
+                    if (myChart) myChart.destroy(); // checks if there is an exisitng chart on the screen
 
                     const ctx = document.getElementById('progressChart').getContext('2d');
                     myChart = new Chart(ctx, {

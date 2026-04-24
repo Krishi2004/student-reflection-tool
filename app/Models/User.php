@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * 
      *
      * @var list<string>
      */
@@ -24,7 +24,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * 
      *
      * @var list<string>
      */
@@ -46,11 +46,11 @@ class User extends Authenticatable
         ];
     }
 
-    public function reflections(){
+    public function reflections(){ // user can have many reflections
         return $this->hasMany(Reflection:: class);
     }
 
-    public function goals() {
+    public function goals() { // user can have many goals
         return $this->hasMany(Goal:: class);
     }
 }

@@ -26,14 +26,15 @@
     <div class="center">
         <div style="overflow: auto; margin-bottom: 20px;">
             <h2 class="float-left text-lg font-bold">Edit Goal</h2>
-            <a href="{{ route('goals') }}" style="float: right;" class="text-gray-500 hover:text-red-500 font-bold">X</a>
+            <a href="{{ route('goals') }}" style="float: right;"
+                class="text-gray-500 hover:text-red-500 font-bold">X</a>
         </div>
 
 
         <form action="{{ route('goals.update', $goal->id) }}" method="POST">
             @csrf
             @method('PUT')
-            
+
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Goal Title</label>
@@ -90,22 +91,24 @@
                     <p class="mb-4 text-sm text-gray-500">Add smaller, manageable steps to help you reach this goal.</p>
 
                     <div id="steps-container">
-                        
-                        {{-- Load existing steps from the database --}}
+
                         @if($goal->actionSteps->count() > 0)
                             @foreach ($goal->actionSteps as $step)
                                 <div class="flex gap-2 mb-3 step-row">
-                                    <input type="text" name="steps[]" value="{{ $step->description }}" required 
+                                    <input type="text" name="steps[]" value="{{ $step->description }}" required
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <button type="button" class="px-3 py-2 font-bold text-red-500 hover:text-red-700 remove-step-btn" title="Remove this step">✕</button>
+                                    <button type="button"
+                                        class="px-3 py-2 font-bold text-red-500 hover:text-red-700 remove-step-btn"
+                                        title="Remove this step">✕</button>
                                 </div>
                             @endforeach
                         @else
-                            {{-- Fallback if no steps exist yet --}}
                             <div class="flex gap-2 mb-3 step-row">
-                                <input type="text" name="steps[]" placeholder="Next step..." required 
+                                <input type="text" name="steps[]" placeholder="Next step..." required
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <button type="button" class="px-3 py-2 font-bold text-red-500 hover:text-red-700 remove-step-btn" title="Remove this step">✕</button>
+                                <button type="button"
+                                    class="px-3 py-2 font-bold text-red-500 hover:text-red-700 remove-step-btn"
+                                    title="Remove this step">✕</button>
                             </div>
                         @endif
 
@@ -119,21 +122,23 @@
             </div>
 
             <div class="flex justify-end space-x-3 pt-4 border-t">
-                <a href="{{ route('goals') }}" class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</a>
-                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
+                <a href="{{ route('goals') }}"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</a>
+                <button type="submit"
+                    class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Save</button>
             </div>
         </form>
 
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        // used for + add action step button 
+        document.addEventListener('DOMContentLoaded', function () { // waits for the website to load all the content
             const container = document.getElementById('steps-container');
             const addButton = document.getElementById('add-step-btn');
 
-            // 1. Add new step
-            if(addButton && container) {
-                addButton.addEventListener('click', function () {
+            if (addButton && container) { // checks if the Add button is on the screen 
+                addButton.addEventListener('click', function () { // waits for the user to click the add button
                     const newRow = document.createElement('div');
                     newRow.className = 'flex gap-2 mb-3 step-row';
                     newRow.innerHTML = `
@@ -141,12 +146,11 @@
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <button type="button" class="px-3 py-2 font-bold text-red-500 hover:text-red-700 remove-step-btn" title="Remove this step">✕</button>
                     `;
-                    container.appendChild(newRow);
+                    container.appendChild(newRow); // add the temporary DIV to the actual website
                 });
             }
 
-            // 2. Remove step (works for both old and new steps)
-            if(container) {
+            if (container) {
                 container.addEventListener('click', function (e) {
                     if (e.target.classList.contains('remove-step-btn')) {
                         e.target.closest('.step-row').remove();
@@ -157,4 +161,5 @@
     </script>
 
 </body>
+
 </html>

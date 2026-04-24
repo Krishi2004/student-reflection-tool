@@ -9,7 +9,7 @@ class Goal extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+    protected $fillable = [ // all the columns in the Goal table
         'student_id',
         'skill_id',
         'target_score',
@@ -20,24 +20,22 @@ class Goal extends Model
         'deadline',
     ];
 
-    public static function getStatus() {
+    public static function getStatus() { // function to get the status of a goal
         return ['In Progress', 'Completed', 'Abandoned'];
     }
 
-    // Relationship: A Goal belongs to a Student
-    public function student()
+    public function student() //links the goal to the user who created it
     {
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    // Relationship: A Goal belongs to a Skill
-    public function skill()
+
+    public function skill() // which skill belongs to that goal
     {
         return $this->belongsTo(Skill::class);
     }
 
-    // Relationship: A Goal has many Action Steps
-    public function actionSteps()
+    public function actionSteps() // one to many relationship (One goal can have many action steps)
     {
         return $this->hasMany(ActionStep::class);
     }

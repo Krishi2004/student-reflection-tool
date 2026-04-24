@@ -19,7 +19,15 @@ class ReflectionVerification extends Mailable
     public function __construct($reflection)
     {
         $this->reflection = $reflection;
-        $this->verification_url = URL::temporarySignedRoute('reflection.review', now()->addDays(7), ['id' => $reflection->id]);
+
+        $assessment = $reflection->skillAssessments()->first(); // gets the record in the skill assessment table
+
+
+
+        $this->verification_url = route('reflection.review', [ // generates the link that the supervisor will click
+            'id' => $reflection->id,
+            'verification_token' => $assessment->verification_token,
+        ]);
     }
 
     /**
@@ -28,7 +36,7 @@ class ReflectionVerification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reflection Verification',
+            subject: 'Reflection Verification', // subject name of the email
         );
     }
 
@@ -38,7 +46,7 @@ class ReflectionVerification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.reflections.verification',
+            markdown: 'emails.reflections.verification', // the view file for the email
         );
     }
 

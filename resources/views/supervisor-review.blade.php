@@ -65,43 +65,33 @@
                     </ul>
                 </div>
             @endif
-
             <form action="{{ request()->fullUrl() }}" method="POST">
                 @csrf
 
-                <form action="{{ request()->fullUrl() }}" method="POST">
-                    @csrf
+                <div class="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <label for="verifier_score" class="block text-sm font-semibold text-blue-900 uppercase mb-2">
+                        Evaluate this Skill (1-5)
+                    </label>
+                    <select name="verifier_score" id="verifier_score" required
+                        class="w-full p-2 border border-blue-200 rounded text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="" disabled selected>Select a score...</option>
+                        <option value="1">1 - Needs Significant Improvement</option>
+                        <option value="2">2 - Below Expectations</option>
+                        <option value="3">3 - Meets Expectations</option>
+                        <option value="4">4 - Exceeds Expectations</option>
+                        <option value="5">5 - Exceptional</option>
+                    </select>
+                </div>
 
-                    <div class="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <label for="verifier_score" class="block text-sm font-semibold text-blue-900 uppercase mb-2">
-                            Evaluate this Skill (1-5)
-                        </label>
-                        <select name="verifier_score" id="verifier_score" required
-                            class="w-full p-2 border border-blue-200 rounded text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="" disabled selected>Select a score...</option>
-                            <option value="1">1 - Needs Significant Improvement</option>
-                            <option value="2">2 - Below Expectations</option>
-                            <option value="3">3 - Meets Expectations</option>
-                            <option value="4">4 - Exceeds Expectations</option>
-                            <option value="5">5 - Exceptional</option>
-                        </select>
-                    </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded hover:bg-blue-700 transition">
+                    Approve & Verify Reflection
+                </button>
 
-                    <button type="submit"
-                        class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded hover:bg-blue-700 transition">
-                        Approve & Verify Reflection
-                    </button>
-
-                </form>
+            </form>
 
 
         </div>
-</body>
-
-</html>
-</form>
-</div>
-</div>
 </body>
 
 </html>

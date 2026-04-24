@@ -127,28 +127,6 @@
         </form>
 
     </div>
-
-    <script>
-        $(document).ready(function () {
-            @if ($errors->any())
-                $('.center').show();
-                $('#show').hide();
-            @endif
-
-
-            $('#show').on('click', function () {
-                $('.center').fadeIn();
-                $(this).hide();
-            });
-
-            $('#cancelBtn2').on('click', function () {
-                $('.center').fadeOut();
-                $('#show').fadeIn();
-            });
-        });
-
-    </script>
-
 </body>
 
 </html>

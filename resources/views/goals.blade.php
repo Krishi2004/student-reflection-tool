@@ -190,7 +190,8 @@
                 <div style="overflow: auto; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                     <h2 id="view-title" class="float-left text-xl font-bold text-gray-900">{{ old('title', $goal->title) }}
                     </h2>
-                    <button onclick="$('#viewModal-{{ $goal->id }}').fadeOut(); $('#show').fadeIn();" style="float: right;" class="text-gray-500 hover:text-red-500 font-bold">X</button>
+                    <button onclick="$('#viewModal-{{ $goal->id }}').fadeOut(); $('#show').fadeIn();" style="float: right;"
+                        class="text-gray-500 hover:text-red-500 font-bold">X</button>
                 </div>
 
                 <div class="mb-4">
@@ -238,7 +239,6 @@
                     <button type="button" onclick="$('#viewModal-{{ $goal->id }}').fadeOut(); $('#show').fadeIn();"
                         class="px-4 py-2 text-gray-600 hover:text-gray-800 border rounded">Cancel</button>
 
-                    <!-- We can dynamically update these links later if needed -->
                     <a id="view-edit-btn" href="{{ route('goals.edit', $goal->id) }}"
                         class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded font-bold">Edit</a>
                     <form action="{{ route('goal.delete', $goal->id) }}" method="POST"
@@ -261,65 +261,39 @@
 
     <script>
 
-        const goalsData = @json($goals);
+        const goalsData = @json($goals); // converts all the goals from the DB to a JS object
 
         $(document).ready(function () {
-
-            $('.close-modal-btn').on('click', function (e) {
-                e.preventDefault();
-
-                // Find the specific modal this button is inside of and fade it out
-                $(this).closest('.center').fadeOut();
-
-                // Bring back the "Add New" button
-                $('#show').fadeIn();
-            });
-
-            @if ($errors->any())
+            @if ($errors->any()) // keeps the form open if there is any errors
                 $('#createmodal').show();
                 $('#show').hide();
             @endif
-
-
-            $('#show').on('click', function () {
+            $('#show').on('click', function () { // shows the form when the user click add new goal
                 $('#createmodal').fadeIn();
                 $(this).hide();
             });
-
-
-            $('#close, #cancelBtn').on('click', function (e) {
+            $('#close, #cancelBtn, .close-view, .close-view-btn, .close-modal-btn').on('click', function (e) { // closes the form when the user click 'x' or 'cancel'
                 e.preventDefault();
-                $('#createmodal').fadeOut();
-                $('#show').fadeIn();
-            });
-
-
-            $('.close-view, .close-view-btn').on('click', function (e) {
-                e.preventDefault();
-
-                $(this).closest('.center').fadeOut();
+                $(this).closest('.center, #createmodal').fadeOut();
                 $('#show').fadeIn();
             });
         });
 
 
-        function openViewModal(id) {
+        function openViewModal(id) { // used for the 'view details' button
             $('#viewModal-' + id).fadeIn();
             $('#show').hide();
         }
 
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () { // waits until the website is loaded
             const container = document.getElementById('steps-container');
             const addButton = document.getElementById('add-step-btn');
 
-            // When the user clicks "Add another step"
-            addButton.addEventListener('click', function () {
-                // Create a new div to hold the input
+
+            addButton.addEventListener('click', function () { // wait until the user clicks create new goal
                 const newRow = document.createElement('div');
                 newRow.className = 'flex gap-2 mb-3 step-row';
-
-                // Put the input box inside the div (plus a little 'X' to delete it)
                 newRow.innerHTML = `
             <input type="text" name="steps[]" placeholder="Next step..."
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
@@ -327,15 +301,12 @@
                     ✕
                 </button>
             `;
-
-                // Add it to the screen
-                container.appendChild(newRow);
+                container.appendChild(newRow); // creates a temporary DIV and adds it on the screen for the user to see
             });
 
-            // Event listener for the 'X' remove buttons (using Event Delegation)
-            container.addEventListener('click', function (e) {
+
+            container.addEventListener('click', function (e) { // waits until the user clicks the 'x' button
                 if (e.target.classList.contains('remove-step-btn')) {
-                    // Find the parent row of the clicked 'X' and delete it
                     e.target.closest('.step-row').remove();
                 }
             });

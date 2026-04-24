@@ -9,7 +9,7 @@ class SkillAssessment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+    protected $fillable = [ // columns for the SkillAssessment table
         'reflection_id',
         'skill_id',
         'self_score',
@@ -19,7 +19,7 @@ class SkillAssessment extends Model
         'verification_token',
     ];
 
-    public function reflection()
+    public function reflection() 
     {
         return $this->belongsTo(Reflection::class);
     }

@@ -11,7 +11,7 @@ class SkillSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run(): void // populates the skill table with the below skills
     {
         // Inserting the core skills list
         DB::table('skills')->insert([

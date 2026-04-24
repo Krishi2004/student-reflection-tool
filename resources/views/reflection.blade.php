@@ -283,29 +283,25 @@
     </div>
 
     <script>
+        // used for the 'Level UP' button
         $(document).ready(function () {
             @if ($errors->any())
                 $('.center').show();
                 $('#show').hide();
             @endif
 
-            $('#show').on('click', function () {
+            $('#show').on('click', function () { // show the reflection form
                 $('.center').fadeIn();
                 $(this).hide();
             });
 
-            $('#close').on('click', function (e) {
+            $('#cancelBtn, #close').on('click', function () { // close the reflection form by 'x' or 'cancel'
                 e.preventDefault();
                 $('.center').fadeOut();
                 $('#show').fadeIn();
             });
 
-            $('#cancelBtn').on('click', function () {
-                $('.center').fadeOut();
-                $('#show').fadeIn();
-            });
-
-            const labels = { 1: 'Starter', 2: 'Beginner', 3: 'Intermediate', 4: 'Advanced', 5: 'Expert' };
+            const labels = { 1: 'Starter', 2: 'Beginner', 3: 'Intermediate', 4: 'Advanced', 5: 'Expert' }; // Self score slider labels
             const actionPlanSection = document.getElementById('actionPlanSection');
             const actionInputs = [
                 document.getElementById('action1'),
@@ -313,14 +309,14 @@
                 document.getElementById('action3')
             ];
 
-            $('#scoreRange').on('input', function () {
+            $('#scoreRange').on('input', function () { // updates the UI when the slider is changed
                 const val = parseInt($(this).val());
                 $('#scoreValue').text(val);
                 $('#scoreLabel').text(labels[val]);
-                const colorClass = val <= 2 ? 'text-red-500' : (val == 3 ? 'text-orange-500' : 'text-green-600');
+                const colorClass = val <= 2 ? 'text-red-500' : (val == 3 ? 'text-orange-500' : 'text-green-600'); // changes the colour when number is higher than 3
                 $('#scoreValue').removeClass('text-red-500 text-orange-500 text-green-600 text-indigo-600').addClass(colorClass);
 
-                if (val < 4) {
+                if (val < 4) { // shows the action plan when the slider is less than 4
                     actionPlanSection.style.maxHeight = "500px";
                     actionPlanSection.style.opacity = "1";
                     actionInputs.forEach(input => input.setAttribute('required', 'true'));
@@ -338,30 +334,30 @@
             const form = document.getElementById('reflectionForm');
             const textareas = document.querySelectorAll('.gibberish-check');
 
-            function isGibberish(text) {
+            function isGibberish(text) { // checks if the user has inputted actual sentences rather than trying to bypass the 20 character limit
                 if (text.trim().length === 0) return null;
-                if (text.trim().length < 15) return "Response is too short. Please elaborate!";
-                if (!/^[a-zA-Z0-9\s.,!?'"()\-]+$/.test(text)) return "Please use standard English characters only.";
-                if (!/[aeiouy]/i.test(text)) return "Please use real words (missing vowels detected).";
-                if (/[^aeiouy\s]{5,}/i.test(text)) return "This looks like a keyboard smash. Please write clearly.";
-                if (/(.)\1{4,}/.test(text)) return "Please avoid repeating the same character over and over.";
+                if (text.trim().length < 20) return "Response is too short. Please elaborate!"; // minimum 20 character 
+                if (!/^[a-zA-Z0-9\s.,!?'"()\-]+$/.test(text)) return "Please use standard English characters only."; // uses regex to detect standard english
+                if (!/[aeiouy]/i.test(text)) return "Please use real words (missing vowels detected)."; // Vowel check 
+                if (/[^aeiouy\s]{5,}/i.test(text)) return "This looks like a keyboard smash. Please write clearly."; //detects consectutive constants
+                if (/(.)\1{4,}/.test(text)) return "Please avoid repeating the same character over and over."; // detects repeated characters
                 return null;
             }
 
             if (form && textareas.length > 0) {
 
-                form.addEventListener('submit', function (event) {
+                form.addEventListener('submit', function (event) { // waits until the user has clicked submit
                     let hasError = false;
                     let firstErrorElement = null;
 
-                    textareas.forEach(textarea => {
+                    textareas.forEach(textarea => { // runs the isGibberish function on all fields
                         const errorMessage = isGibberish(textarea.value);
                         const errorContainer = document.getElementById('error-' + textarea.name);
 
                         if (errorContainer) {
                             const errorText = errorContainer.querySelector('.error-text');
 
-                            if (errorMessage) {
+                            if (errorMessage) { 
                                 hasError = true;
                                 if (errorText) errorText.innerText = errorMessage;
                                 errorContainer.style.display = 'flex';
@@ -378,13 +374,13 @@
                     }
                 });
 
-                textareas.forEach(textarea => {
+                textareas.forEach(textarea => { // validation before they move on to the next box
                     const errorContainer = document.getElementById('error-' + textarea.name);
 
                     if (errorContainer) {
                         const errorText = errorContainer.querySelector('.error-text');
 
-                        textarea.addEventListener('blur', function () {
+                        textarea.addEventListener('blur', function () { // error message appears when they click off the box rather than waiting to hit submit
                             const errorMessage = isGibberish(textarea.value);
                             if (errorMessage) {
                                 if (errorText) errorText.innerText = errorMessage;
@@ -403,7 +399,7 @@
 
         });
 
-        function LevelUp(skillId) {
+        function LevelUp(skillId) { // form for the Level up button
             if (skillId) {
                 $('#skill_id_select').val(skillId);
             }
