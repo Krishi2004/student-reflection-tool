@@ -295,11 +295,17 @@
                 $(this).hide();
             });
 
-            $('#cancelBtn, #close').on('click', function () { // close the reflection form by 'x' or 'cancel'
-                e.preventDefault();
+            $('#close').on('click', function () { // close the reflection form by 'x' or 'cancel'
                 $('.center').fadeOut();
                 $('#show').fadeIn();
             });
+
+            $('#cancelBtn').on('click', function () { // close the reflection form by 'x' or 'cancel'
+                $('.center').fadeOut();
+                $('#show').fadeIn();
+            });
+
+
 
             const labels = { 1: 'Starter', 2: 'Beginner', 3: 'Intermediate', 4: 'Advanced', 5: 'Expert' }; // Self score slider labels
             const actionPlanSection = document.getElementById('actionPlanSection');
@@ -357,7 +363,7 @@
                         if (errorContainer) {
                             const errorText = errorContainer.querySelector('.error-text');
 
-                            if (errorMessage) { 
+                            if (errorMessage) {
                                 hasError = true;
                                 if (errorText) errorText.innerText = errorMessage;
                                 errorContainer.style.display = 'flex';

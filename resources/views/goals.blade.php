@@ -148,7 +148,11 @@
                                     {{ $goal->target_score }}
                                 </span>
                             </div>
-                            <span class="text-xs text-orange-500 font-semibold">{{ $goal->status }}</span>
+                            @if($goal->status === 'Completed')
+                                <span class="text-xs text-green-600 font-semibold">{{ $goal->status }}</span>
+                            @else
+                                <span class="text-xs text-orange-500 font-semibold">{{ $goal->status }}</span>
+                            @endif
                         </div>
                         @foreach($goal->actionSteps as $step)
                             <div class="flex items-center gap-2 mt-2">

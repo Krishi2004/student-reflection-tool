@@ -34,12 +34,12 @@ class ReflectionController extends Controller
 
     public function index() // Allows the user to view the reflection page
     {
-        
+
         $skills = Skill::all(); // selects all the skills from the DB
 
         $reflections = Reflection::where('user_id', Auth::id()) // Selects all the reflections related to that user with the skill names
             ->with('skillAssessments.skill')
-            ->latest() 
+            ->latest()
             ->get();
 
 
@@ -73,7 +73,7 @@ class ReflectionController extends Controller
             'is_verified' => true
         ]);
 
-        
+
         $reflection = Reflection::findOrFail($id);
         $reflection->update(['verified_at' => now()]);
 
@@ -109,6 +109,25 @@ class ReflectionController extends Controller
             abort(403, 'unauthorised action');
         }
 
+        $assessment = $reflection->skillAssessments()->first();
+
+        if ($assessment && $assessment->is_verified === 1) {
+            $verification_token = hash('sha256', Auth::id() . now() . Str::random(10));
+
+
+            $assessment->update([
+                'is_verified' => 0,
+                'verification_token' => $verification_token,
+            ]);
+
+            $reflection->verified_at = null;
+            $reflection->save();
+
+            Mail::to($request->supervisor_email)->send(new ReflectionVerification($reflection));
+        }
+
+
+
         // 1. VALIDATION
         $request->validate([ // validation for the STAR format and other fields
             'title' => 'required|string|max:255',
@@ -123,7 +142,9 @@ class ReflectionController extends Controller
             'action_plan' => 'sometimes|nullable|array',
         ]);
 
-        
+
+
+
         $narrativeData = [ // puts the STAR data in an array
             'situation' => $request->situation,
             'task' => $request->task,
@@ -144,11 +165,11 @@ class ReflectionController extends Controller
             $narrativeData['action_plan'] = null;
         }
 
-        
+
         $text = $request->situation . " " . $request->task . " " . $request->action . " " . $request->result . " " . $request->analysis;
         $qualityScore = min(5.0, round(str_word_count($text) / 50, 2)); // calculates the quality score
 
-        
+
         $reflection->update([ // updates the record with the new data
             'title' => $request->title,
             'narrative' => $narrativeData,
@@ -168,7 +189,7 @@ class ReflectionController extends Controller
 
     public function store(Request $request) // function to create a new reflection
     {
-        
+
         $request->validate([ // validation rules for the form
             'title' => 'required|string|max:255',
             'skill_id' => 'required|exists:skills,id',
@@ -202,7 +223,7 @@ class ReflectionController extends Controller
             $narrativeData['action_plan'] = array_filter($request->action_plan);
         }
 
-        $verification_token = hash('sha256', Auth::id().now().Str::random(10)); // creates the verification token for the supervisor link
+        $verification_token = hash('sha256', Auth::id() . now() . Str::random(10)); // creates the verification token for the supervisor link
 
         $reflection = Reflection::create([ // creates the new reflection
             'user_id' => Auth::id(),

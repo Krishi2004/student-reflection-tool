@@ -83,7 +83,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Notes</label>
-                    <input type="text" name="notes" value="{{ old('notes') }}" class="w-full rounded border-gray-300">
+                    <input type="text" name="description" value="{{ old('description', $goal->description ?? '') }}" class="w-full rounded border-gray-300">
                 </div>
 
                 <div class="col-span-2 pt-4 border-t">
